@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp3.0</TargetFramework>
+    <RootNamespace>hf_vault</RootNamespace>
+    <SourcesDir>src</SourcesDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="Program.fs"/>
+  </ItemGroup>
+  <ItemGroup>
+  </ItemGroup>
+</Project>
