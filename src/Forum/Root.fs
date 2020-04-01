@@ -21,7 +21,6 @@ module HfVault.Forum.Root
 #light "off"
 
 open System
-open System.Text.RegularExpressions
 open System.Xml.XPath
 open Aether
 open Aether.Operators
@@ -38,22 +37,19 @@ let themeXpath =
 let extractId (node:HtmlNode) =
   let url = node.GetAttributeValue("href", null) in
   // We assume that each node has a href attribute.
-  let regex = Regex("/(\d+)/$").Match(url) in
-  if regex.Success
-  then regex.Groups.[1].Value^.(Prism.ofEpimorphism String.int32_)
-  else None
+  IO.DirectoryInfo(url).Name^.(Prism.ofEpimorphism String.int32_)
 
-let extractName (node:HtmlNode) = Some (node^.HtmlNode.innerText_)
+let extractName = Optic.get HtmlNode.innerText_
 
 let extractTheme locale (node:HtmlNode) =
-  (extractId node, extractName node)
-  ||> Option.map2
-      ( fun id name ->
-          Theme.new_
-          |> locale^=Theme.locale_
-          |> id^=Theme.id_
-          |> name^=Theme.name_
-      )
+  extractId node
+  |> Option.map
+       ( fun id ->
+           Theme.new_
+           |> locale^=Theme.locale_
+           |> id^=Theme.id_
+           |> (extractName node)^=Theme.name_
+       )
 
 let load (web:HtmlWeb) locale =
   let uri = UriBuilder(locale^.Locale.host_, Path="forum.html") in
