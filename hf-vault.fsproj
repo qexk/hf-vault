@@ -6,7 +6,14 @@
     <SourcesDir>src</SourcesDir>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Program.fs"/>
+    <Compile Include="$(SourcesDir)/Locale.fs"/>
+    <Compile Include="$(SourcesDir)/Optics.fsi"/>
+    <Compile Include="$(SourcesDir)/Optics.fs"/>
+    <Compile Include="$(SourcesDir)/Forum/Theme.fsi"/>
+    <Compile Include="$(SourcesDir)/Forum/Theme.fs"/>
+    <Compile Include="$(SourcesDir)/Forum/Root.fsi"/>
+    <Compile Include="$(SourcesDir)/Forum/Root.fs"/>
+    <Compile Include="$(SourcesDir)/HfVault.fs"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23"/>

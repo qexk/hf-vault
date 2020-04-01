@@ -16,17 +16,16 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.__main__
-#nowarn "62"
-#light "off"
+module HfVault.Forum.Theme
 
-open HtmlAgilityPack
-open HfVault
+open Aether
 
-[<EntryPoint>]
-let main _ =
-  let web = HtmlWeb () in
-  let locale = Locale.FR in
-  let root = Forum.Root.load web locale in
-  printfn "%A" root;
-  0
+type T
+
+val new_ : T
+
+val locale_ : Lens<T, HfVault.Locale.T>
+
+val id_ : Lens<T, int>
+
+val name_ : Lens<T, string>

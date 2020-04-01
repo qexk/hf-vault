@@ -16,17 +16,17 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.__main__
+module HfVault.Locale
 #nowarn "62"
 #light "off"
 
-open HtmlAgilityPack
-open HfVault
+open Aether
 
-[<EntryPoint>]
-let main _ =
-  let web = HtmlWeb () in
-  let locale = Locale.FR in
-  let root = Forum.Root.load web locale in
-  printfn "%A" root;
-  0
+type T = FR
+
+let host_ : Lens<T, System.Uri> =
+  ( ( function
+      | FR -> System.Uri("http://www.hammerfest.fr")
+    )
+  , fun _ _ -> failwith "unimplemented"
+  )

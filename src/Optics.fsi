@@ -16,17 +16,22 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.__main__
-#nowarn "62"
-#light "off"
+namespace HfVault.Optics
 
+open Aether
 open HtmlAgilityPack
-open HfVault
 
-[<EntryPoint>]
-let main _ =
-  let web = HtmlWeb () in
-  let locale = Locale.FR in
-  let root = Forum.Root.load web locale in
-  printfn "%A" root;
-  0
+module HtmlWeb =
+  val get_ : System.Uri -> Prism<HtmlWeb, HtmlDocument>
+
+module HtmlDocument =
+  val root_ : Prism<HtmlDocument, HtmlNode>
+
+module HtmlNode =
+  val nodes_ : System.Xml.XPath.XPathExpression
+            -> Lens<HtmlNode, HtmlNode seq>
+
+  val innerText_ : Lens<HtmlNode, string>
+
+module String =
+  val int32_ : Epimorphism<string, int32>

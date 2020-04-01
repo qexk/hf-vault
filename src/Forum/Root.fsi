@@ -16,17 +16,10 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.__main__
-#nowarn "62"
-#light "off"
+module HfVault.Forum.Root
 
-open HtmlAgilityPack
-open HfVault
+type T
 
-[<EntryPoint>]
-let main _ =
-  let web = HtmlWeb () in
-  let locale = Locale.FR in
-  let root = Forum.Root.load web locale in
-  printfn "%A" root;
-  0
+val load : HtmlAgilityPack.HtmlWeb
+        -> HfVault.Locale.T
+        -> T option
