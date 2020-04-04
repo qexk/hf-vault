@@ -30,3 +30,10 @@ let host_ : Lens<T, System.Uri> =
     )
   , fun _ _ -> failwith "unimplemented"
   )
+
+let globalization_ : Lens<T, System.Globalization.CultureInfo> =
+  ( ( function
+      | FR -> System.Globalization.CultureInfo("FR")
+    )
+  , fun _ _ -> failwith "unimplemented"
+  )

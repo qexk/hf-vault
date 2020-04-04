@@ -29,3 +29,7 @@ val locale_ : Lens<T, HfVault.Locale.T>
 val id_ : Lens<T, int>
 
 val name_ : Lens<T, string>
+
+val load : HtmlAgilityPack.HtmlWeb
+        -> T
+        -> Thread.T list

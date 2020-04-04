@@ -35,14 +35,8 @@ end
 module HtmlDocument = begin
   open HtmlAgilityPack
 
-  let root_ : Prism<HtmlDocument, _> =
-    ( ( fun doc ->
-          if Seq.length doc.ParseErrors > 0
-          then None
-          else Some doc.DocumentNode
-      )
-    , (fun root _ -> root.OwnerDocument)
-    )
+  let root_ : Lens<HtmlDocument, _> =
+    (fun doc -> doc.DocumentNode), (fun root _ -> root.OwnerDocument)
 end
 
 module HtmlNode = begin
@@ -50,6 +44,11 @@ module HtmlNode = begin
 
   let nodes_ (xpath:Xml.XPath.XPathExpression) : Lens<HtmlNode, _> =
     ( (fun doc -> doc.SelectNodes(xpath) :> HtmlNode seq)
+    , fun _ _ -> failwith "unimplemented"
+    )
+
+  let node_ (xpath:Xml.XPath.XPathExpression) : Lens<HtmlNode, _> =
+    ( (fun doc -> doc.SelectSingleNode(xpath))
     , fun _ _ -> failwith "unimplemented"
     )
 
@@ -68,5 +67,14 @@ module String = begin
           else None
       )
     , (fun i -> i.ToString())
+    )
+end
+
+module Seq = begin
+  open System.Collections.Generic
+
+  let enumerator_ : Lens<_ seq, _> =
+    ( (fun seq -> seq.GetEnumerator())
+    , fun _ _ -> failwith "unimplemented"
     )
 end

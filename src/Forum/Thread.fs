@@ -16,28 +16,21 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-namespace HfVault.Optics
+module HfVault.Forum.Thread
+#nowarn "62"
+#light "off"
 
-open Aether
-open HtmlAgilityPack
+open HfVault
 
-module HtmlWeb =
-  val get_ : System.Uri -> Prism<HtmlWeb, HtmlDocument>
+type T = { locale : Locale.T
+         ; id : int
+         ; name : string
+         ; lastYear : int
+         }
 
-module HtmlDocument =
-  val root_ : Lens<HtmlDocument, HtmlNode>
+let new_ = {locale=Unchecked.defaultof<_>;id=0;name=null;lastYear=0}
 
-module HtmlNode =
-  val nodes_ : System.Xml.XPath.XPathExpression
-            -> Lens<HtmlNode, HtmlNode seq>
-
-  val node_ : System.Xml.XPath.XPathExpression
-            -> Lens<HtmlNode, HtmlNode>
-
-  val innerText_ : Lens<HtmlNode, string>
-
-module String =
-  val int32_ : Epimorphism<string, int32>
-
-module Seq =
-  val enumerator_ : Lens<'α seq, 'α System.Collections.Generic.IEnumerator>
+let locale_ = (fun {locale=l} -> l), (fun l t -> {t with locale=l})
+let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
+let name_ = (fun {name=n} -> n), (fun n t -> {t with name=n})
+let lastYear_ = (fun {lastYear=l} -> l), (fun l t -> {t with lastYear=l})

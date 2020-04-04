@@ -16,28 +16,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-namespace HfVault.Optics
+module HfVault.Forum.Thread
 
 open Aether
-open HtmlAgilityPack
 
-module HtmlWeb =
-  val get_ : System.Uri -> Prism<HtmlWeb, HtmlDocument>
+type T
 
-module HtmlDocument =
-  val root_ : Lens<HtmlDocument, HtmlNode>
+val new_ : T
 
-module HtmlNode =
-  val nodes_ : System.Xml.XPath.XPathExpression
-            -> Lens<HtmlNode, HtmlNode seq>
-
-  val node_ : System.Xml.XPath.XPathExpression
-            -> Lens<HtmlNode, HtmlNode>
-
-  val innerText_ : Lens<HtmlNode, string>
-
-module String =
-  val int32_ : Epimorphism<string, int32>
-
-module Seq =
-  val enumerator_ : Lens<'α seq, 'α System.Collections.Generic.IEnumerator>
+val locale_ : Lens<T, HfVault.Locale.T>
+val id_ : Lens<T, int>
+val name_ : Lens<T, string>
+val lastYear_ : Lens<T, int>
