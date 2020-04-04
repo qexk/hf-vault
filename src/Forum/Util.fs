@@ -16,47 +16,20 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.Forum.Root
+module HfVault.Forum.Util
 #nowarn "62"
 #light "off"
 
 open System
-open System.Xml.XPath
 open Aether
 open Aether.Operators
 open HtmlAgilityPack
-open HfVault
 open HfVault.Optics
 
-type T = T of Theme.T array
-
-let themeXpath =
-  XPathExpression.Compile
-    "//*[@class='categ']/a[starts-with(@href,'/forum')]"
-
-let extractId = Util.extractLinkId
-
-let extractName = Optic.get HtmlNode.innerText_
-
-let extractTheme locale (node:HtmlNode) =
-  extractId node
-  |> Option.map
-       ( fun id ->
-           Theme.new_
-           |> locale^=Theme.locale_
-           |> id^=Theme.id_
-           |> (extractName node)^=Theme.name_
-       )
-
-let load (web:HtmlWeb) locale =
-  let uri = UriBuilder(locale^.Locale.host_, Path="forum.html") in
-  let themeNodes_ = HtmlWeb.get_ uri.Uri
-                >?> HtmlDocument.root_
-                >?> HtmlNode.nodes_ themeXpath in
-  web^.themeNodes_
-  |> Option.map
-       ( Seq.map (extractTheme locale)
-      >> Seq.collect Option.toList
-      >> Seq.toArray
-      >> T
-       )
+let extractLinkId (node:HtmlNode) =
+  node.GetAttributeValue("href", null)
+  |> Option.ofObj
+  |> Option.bind
+     ( fun url ->
+         IO.DirectoryInfo(url).Name^.(Prism.ofEpimorphism String.int32_)
+     )
