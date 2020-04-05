@@ -47,8 +47,8 @@ module HtmlNode = begin
     , fun _ _ -> failwith "unimplemented"
     )
 
-  let node_ (xpath:Xml.XPath.XPathExpression) : Lens<HtmlNode, _> =
-    ( (fun doc -> doc.SelectSingleNode(xpath))
+  let node_ (xpath:Xml.XPath.XPathExpression) : Prism<HtmlNode, _> =
+    ( (fun doc -> doc.SelectSingleNode(xpath) |> Option.ofObj)
     , fun _ _ -> failwith "unimplemented"
     )
 

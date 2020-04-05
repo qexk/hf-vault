@@ -32,7 +32,7 @@ module HtmlNode =
             -> Lens<HtmlNode, HtmlNode seq>
 
   val node_ : System.Xml.XPath.XPathExpression
-            -> Lens<HtmlNode, HtmlNode>
+            -> Prism<HtmlNode, HtmlNode>
 
   val innerText_ : Lens<HtmlNode, string>
 

@@ -58,9 +58,8 @@ let rec loadPage web t acc page =
 let forumDateXpath = XPathExpression.Compile "./td[@class='forumDate']"
 
 let (|Date|_|) node =
-  match node^.(HtmlNode.node_ forumDateXpath) with
-  | null -> None
-  | date -> Some (date.InnerText.Trim())
+  node^.(HtmlNode.node_ forumDateXpath)
+  |> Option.map (fun date -> date.InnerText.Trim())
 
 let forumThreadXpath =
   XPathExpression.Compile
@@ -68,9 +67,9 @@ let forumThreadXpath =
 
 let (|Thread|_|) node =
   match node^.(HtmlNode.node_ forumThreadXpath) with
-  | null -> None
-  | link -> Util.extractLinkId link
-            |> Option.map (fun id -> {|id=id;name=link.InnerText|})
+  | None      -> None
+  | Some link -> Util.extractLinkId link
+                 |> Option.map (fun id -> {|id=id;name=link.InnerText|})
 
 let applyYear t rows =
   let g = t^.(locale_ >-> Locale.globalization_) in
