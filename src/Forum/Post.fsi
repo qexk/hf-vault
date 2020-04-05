@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.Forum.Thread
+module HfVault.Forum.Post
 
 open Aether
 
@@ -25,10 +25,6 @@ type T
 val new_ : T
 
 val realm_ : Lens<T, HfVault.Realm.T>
-val id_ : Lens<T, int>
-val name_ : Lens<T, string>
-val lastYear_ : Lens<T, int>
-
-val load : HtmlAgilityPack.HtmlWeb
-        -> T
-        -> Post.T list
+val author_ : Lens<T, int>
+val createdAt_ : Lens<T, System.DateTime>
+val content_ : Lens<T, string>

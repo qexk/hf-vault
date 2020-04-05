@@ -11,6 +11,8 @@
     <Compile Include="$(SourcesDir)/Optics.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Util.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Util.fs"/>
+    <Compile Include="$(SourcesDir)/Forum/Post.fsi"/>
+    <Compile Include="$(SourcesDir)/Forum/Post.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Thread.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Thread.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Theme.fsi"/>

@@ -16,19 +16,26 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.Forum.Thread
+module HfVault.Forum.Post
+#nowarn "62"
+#light "off"
 
-open Aether
+open System
+open HfVault
 
-type T
+type T = { realm : Realm.T
+         ; author : int
+         ; createdAt : DateTime
+         ; content : string
+         }
 
-val new_ : T
+let new_ = { realm=Unchecked.defaultof<_>
+           ; author=0
+           ; createdAt=Unchecked.defaultof<_>
+           ; content=null
+           }
 
-val realm_ : Lens<T, HfVault.Realm.T>
-val id_ : Lens<T, int>
-val name_ : Lens<T, string>
-val lastYear_ : Lens<T, int>
-
-val load : HtmlAgilityPack.HtmlWeb
-        -> T
-        -> Post.T list
+let realm_ = (fun {realm=r} -> r), (fun r t -> {t with realm=r})
+let author_ = (fun {author=a} -> a), (fun a t -> {t with author=a})
+let createdAt_ = (fun {createdAt=c} -> c), (fun c t -> {t with createdAt=c})
+let content_ = (fun {content=c} -> c), (fun c t -> {t with content=c})
