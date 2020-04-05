@@ -24,7 +24,7 @@ type T
 
 val new_ : T
 
-val locale_ : Lens<T, HfVault.Locale.T>
+val realm_ : Lens<T, HfVault.Realm.T>
 
 val id_ : Lens<T, int>
 

@@ -38,24 +38,24 @@ let extractId = Util.extractLinkId
 
 let extractName = Optic.get HtmlNode.innerText_
 
-let extractTheme locale (node:HtmlNode) =
+let extractTheme realm (node:HtmlNode) =
   extractId node
   |> Option.map
        ( fun id ->
            Theme.new_
-           |> locale^=Theme.locale_
+           |> realm^=Theme.realm_
            |> id^=Theme.id_
            |> (extractName node)^=Theme.name_
        )
 
-let load (web:HtmlWeb) locale =
-  let uri = UriBuilder(locale^.Locale.host_, Path="forum.html") in
+let load (web:HtmlWeb) realm =
+  let uri = UriBuilder(realm^.Realm.host_, Path="forum.html") in
   let themeNodes_ = HtmlWeb.get_ uri.Uri
                 >?> HtmlDocument.root_
                 >?> HtmlNode.nodes_ themeXpath in
   web^.themeNodes_
   |> Option.map
-       ( Seq.map (extractTheme locale)
+       ( Seq.map (extractTheme realm)
       >> Seq.collect Option.toList
       >> Seq.toArray
       >> T

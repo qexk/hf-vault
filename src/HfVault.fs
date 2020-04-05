@@ -26,7 +26,7 @@ open HfVault
 [<EntryPoint>]
 let main _ =
   let web = HtmlWeb () in
-  let locale = Locale.FR in
-  let root = Forum.Root.load web locale in
+  let realm = Realm.FR in
+  let root = Forum.Root.load web realm in
   printfn "%A" root;
   0

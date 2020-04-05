@@ -26,14 +26,14 @@ open Aether.Operators
 open HfVault
 open HfVault.Optics
 
-type T = { locale : Locale.T
+type T = { realm : Realm.T
          ; id : int
          ; name : string
          }
 
-let new_ = {locale=Unchecked.defaultof<_>;id=0;name=null}
+let new_ = {realm=Unchecked.defaultof<_>;id=0;name=null}
 
-let locale_ = (fun {locale=l} -> l), (fun l t -> {t with locale=l})
+let realm_ = (fun {realm=l} -> l), (fun l t -> {t with realm=l})
 
 let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
 
@@ -44,7 +44,7 @@ let rowsXpath =
     "//table[@class='threads']/tr[not(contains(@class,'sticky')) and not(th)]"
 
 let rec loadPage web t acc page =
-  let url = UriBuilder(t.locale^.Locale.host_) in
+  let url = UriBuilder(t.realm^.Realm.host_) in
   url.Path <- sprintf "/forum.html/theme/%i" t.id;
   url.Query <- sprintf "?page=%i" page;
   match web^.HtmlWeb.get_ url.Uri with
@@ -72,7 +72,7 @@ let (|Thread|_|) node =
                  |> Option.map (fun id -> {|id=id;name=link.InnerText|})
 
 let applyYear t rows =
-  let g = t^.(locale_ >-> Locale.globalization_) in
+  let g = t^.(realm_ >-> Realm.globalization_) in
   let mutable year = DateTime.UtcNow.Year in
   let mutable acc = [] in
   use iter = rows^.Seq.enumerator_ in
@@ -91,9 +91,9 @@ let applyYear t rows =
   done;
   acc
 
-let makeThread locale (data:{| id: int32; name: string; year: int |}) =
+let makeThread realm (data:{| id: int32; name: string; year: int |}) =
   Thread.new_
-  |> locale^=Thread.locale_
+  |> realm^=Thread.realm_
   |> data.id^=Thread.id_
   |> data.name^=Thread.name_
   |> data.year^=Thread.lastYear_
@@ -101,4 +101,4 @@ let makeThread locale (data:{| id: int32; name: string; year: int |}) =
 let load web t =
   let rows = loadPage web t [] 1 in
   let threadData = applyYear t rows in
-  List.map (makeThread t.locale) threadData
+  List.map (makeThread t.realm) threadData

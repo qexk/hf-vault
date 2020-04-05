@@ -6,7 +6,7 @@
     <SourcesDir>src</SourcesDir>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="$(SourcesDir)/Locale.fs"/>
+    <Compile Include="$(SourcesDir)/Realm.fs"/>
     <Compile Include="$(SourcesDir)/Optics.fsi"/>
     <Compile Include="$(SourcesDir)/Optics.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Util.fsi"/>

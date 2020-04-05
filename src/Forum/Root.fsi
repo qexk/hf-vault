@@ -21,5 +21,5 @@ module HfVault.Forum.Root
 type T
 
 val load : HtmlAgilityPack.HtmlWeb
-        -> HfVault.Locale.T
+        -> HfVault.Realm.T
         -> T option

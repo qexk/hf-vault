@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module HfVault.Locale
+module HfVault.Realm
 #nowarn "62"
 #light "off"
 
