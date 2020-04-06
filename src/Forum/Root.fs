@@ -30,6 +30,9 @@ open HfVault.Optics
 
 type T = T of Theme.T array
 
+let themes_ : Lens<_, _> =
+  (fun (T themes) -> themes), (fun themes _ -> T themes)
+
 let themeXpath =
   XPathExpression.Compile
     "//*[@class='categ']/a[starts-with(@href,'/forum')]"

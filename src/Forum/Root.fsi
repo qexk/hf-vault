@@ -18,7 +18,11 @@
 
 module HfVault.Forum.Root
 
+open Aether
+
 type T
+
+val themes_ : Lens<T, Theme.T array>
 
 val load : HtmlAgilityPack.HtmlWeb
         -> HfVault.Realm.T
