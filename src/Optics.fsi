@@ -39,5 +39,7 @@ module HtmlNode =
 module String =
   val int32_ : Epimorphism<string, int32>
 
+  val realm_ : Epimorphism<string, HfVault.Realm.T>
+
 module Seq =
   val enumerator_ : Lens<'α seq, 'α System.Collections.Generic.IEnumerator>

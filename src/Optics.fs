@@ -68,6 +68,9 @@ module String = begin
       )
     , (fun i -> i.ToString())
     )
+
+  let realm_ : Epimorphism<string, _> =
+    HfVault.Realm.ofString, HfVault.Realm.toString
 end
 
 module Seq = begin

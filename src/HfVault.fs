@@ -20,13 +20,37 @@ module HfVault.__main__
 #nowarn "62"
 #light "off"
 
+open Aether
+open Aether.Operators
 open HtmlAgilityPack
 open HfVault
+open HfVault.Optics
+
+type Options = { realm : Realm.T
+               } with
+  static member new_ = { realm=Realm.FR
+                       }
+
+  static member usage = """Usage:
+  dotnet hf-vault.exe [options]
+
+Options:
+  -r REALM, --realm REALM  Set the realm to scrape.
+                           [type: FR | EN | ES, default: FR]
+  """
+end
+
+let rec parseArgv o = function
+| ("-r"|"--realm")::r::tl ->
+    begin match r^.(Prism.ofEpimorphism String.realm_) with
+    | Some r -> parseArgv {o with realm=r} tl
+    | None   -> Error (r + ": invalid realm")
+    end
+| jaj::_ -> Error (jaj + ": unknown option")
+| []     -> Ok o
 
 [<EntryPoint>]
-let main _ =
-  let web = HtmlWeb () in
-  let realm = Realm.FR in
-  let root = Forum.Root.load web realm in
-  printfn "%A" root;
-  0
+let main argv =
+  match parseArgv Options.new_ (Array.toList argv) with
+  | Error e -> Printf.eprintfn "error: %s" e; -1
+  | Ok o    -> 0
