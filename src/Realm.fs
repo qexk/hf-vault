@@ -23,17 +23,35 @@ module HfVault.Realm
 open Aether
 
 type T = FR
+       | EN
+       | ES
 
 let host_ : Lens<T, System.Uri> =
   ( ( function
       | FR -> System.Uri("http://www.hammerfest.fr")
+      | EN -> System.Uri("http://www.hfest.net")
+      | ES -> System.Uri("http://www.hammerfest.es")
     )
-  , fun _ _ -> failwith "unimplemented"
+  , ( fun uri _ ->
+        match uri.Host with
+        | "www.hammerfest.fr" -> FR
+        | "www.hfest.net"     -> EN
+        | "www.hammerfest.es" -> ES
+        | _                   -> failwith "wrong host"
+    )
   )
 
 let globalization_ : Lens<T, System.Globalization.CultureInfo> =
   ( ( function
       | FR -> System.Globalization.CultureInfo("FR")
+      | EN -> System.Globalization.CultureInfo("EN")
+      | ES -> System.Globalization.CultureInfo("ES")
     )
-  , fun _ _ -> failwith "unimplemented"
+  , ( fun g _ ->
+        match g.TwoLetterISOLanguageName with
+        | "fr" -> FR
+        | "en" -> EN
+        | "es" -> ES
+        | _    -> failwith "wrong language"
+    )
   )
