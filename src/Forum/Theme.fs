@@ -43,6 +43,10 @@ let rowsXpath =
   XPathExpression.Compile
     "//table[@class='threads']/tr[not(contains(@class,'sticky')) and not(th)]"
 
+let makePageXpath page =
+  sprintf "//div[@class='paginate']/child::*[.='%i' and position() = last()]" page
+  |> XPathExpression.Compile
+
 let rec loadPage web t acc page =
   let url = UriBuilder(t.realm^.Realm.host_) in
   url.Path <- sprintf "/forum.html/theme/%i" t.id;
@@ -53,7 +57,10 @@ let rec loadPage web t acc page =
                 let rows = root^.(HtmlNode.nodes_ rowsXpath) in
                 if isNull rows || Seq.isEmpty rows
                 then acc
-                else loadPage web t (Seq.append acc rows) (page + 1)
+                else let acc = Seq.append acc rows in
+                     if (root^.(HtmlNode.node_ (makePageXpath page))).IsSome
+                     then acc
+                     else loadPage web t acc (page + 1)
 
 let forumDateXpath = XPathExpression.Compile "./td[@class='forumDate']"
 
