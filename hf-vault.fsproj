@@ -6,6 +6,7 @@
     <SourcesDir>src</SourcesDir>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="$(SourcesDir)/DbTypes.fs"/>
     <Compile Include="$(SourcesDir)/Realm.fs"/>
     <Compile Include="$(SourcesDir)/Optics.fsi"/>
     <Compile Include="$(SourcesDir)/Optics.fs"/>
@@ -19,10 +20,15 @@
     <Compile Include="$(SourcesDir)/Forum/Theme.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Theme.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Theme.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfTheme.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfTheme.fs"/>
     <Compile Include="$(SourcesDir)/HfVault.fs"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23"/>
     <PackageReference Include="Aether" Version="8.3.1"/>
+    <PackageReference Include="FSharp.Data.Npgsql" Version="0.2.6-beta"/>
   </ItemGroup>
 </Project>

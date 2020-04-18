@@ -55,3 +55,29 @@ let globalization_ : Lens<T, System.Globalization.CultureInfo> =
         | _    -> failwith "wrong language"
     )
   )
+
+let dbRealm_ : Lens<T, DbTypes.Realm> =
+  ( ( function
+      | FR -> DbTypes.Realm.FR
+      | EN -> DbTypes.Realm.EN
+      | ES -> DbTypes.Realm.ES
+    )
+  , ( fun dbt _ ->
+        match dbt with
+        | DbTypes.Realm.FR -> FR
+        | DbTypes.Realm.EN -> EN
+        | DbTypes.Realm.ES -> ES
+        | _                -> failwith "db error"
+    )
+  )
+
+let ofString = function
+| "FR" -> Some FR
+| "EN" -> Some EN
+| "ES" -> Some ES
+| _    -> None
+
+let toString = function
+| FR -> "FR"
+| EN -> "EN"
+| ES -> "ES"
