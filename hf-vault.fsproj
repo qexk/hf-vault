@@ -20,6 +20,10 @@
     <Compile Include="$(SourcesDir)/Forum/Theme.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Author.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Author.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfUser.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfUser.fs"/>
     <Compile Include="$(SourcesDir)/Dto/Theme.fsi"/>
     <Compile Include="$(SourcesDir)/Dto/Theme.fs"/>
     <Compile Include="$(SourcesDir)/Dto/HfTheme.fsi"/>
