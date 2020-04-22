@@ -81,9 +81,10 @@ let applyDate t posts =
   for i = (Array.length posts) - 1 downto 0 do
     let node = posts.[i] in
     let dateChunkNode = node^.(HtmlNode.node_ messageDateXpath) in
-    let authorId =
-      node^.(HtmlNode.node_ messageAuthorXpath)
-      |> Option.bind Util.extractLinkId
+    let authorId, authorName =
+      match node^.(HtmlNode.node_ messageAuthorXpath) with
+      | None -> None, ""
+      | Some n -> (Util.extractLinkId n), n.InnerText
     in
     let contentNode = node^.(HtmlNode.node_ messageContentXpath) in
     if dateChunkNode.IsSome && authorId.IsSome && contentNode.IsSome
@@ -110,14 +111,18 @@ let applyDate t posts =
                     ) |> not
            do year <- year - 1 done
          in
-         acc <- {|date=date;content=content;author=authorId|}::acc
+         acc <- {|date=date;content=content;id=authorId;name=authorName|}::acc
   done;
   acc
 
-let makePost realm (data:{| author: int; content: string; date: DateTime |}) =
+let makePost
+  realm
+  (data:{| id: int; name: string; content: string; date: DateTime |})
+=
   Post.new_
   |> realm^=Post.realm_
-  |> data.author^=Post.author_
+  |> data.id^=Post.id_
+  |> data.name^=Post.name_
   |> data.date^=Post.createdAt_
   |> data.content^=Post.content_
 

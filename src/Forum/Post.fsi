@@ -25,6 +25,7 @@ type T
 val new_ : T
 
 val realm_ : Lens<T, HfVault.Realm.T>
-val author_ : Lens<T, int>
+val id_ : Lens<T, int>
+val name_ : Lens<T, string>
 val createdAt_ : Lens<T, System.DateTime>
 val content_ : Lens<T, string>

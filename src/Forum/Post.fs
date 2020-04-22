@@ -24,18 +24,21 @@ open System
 open HfVault
 
 type T = { realm : Realm.T
-         ; author : int
+         ; id : int
+         ; name : string
          ; createdAt : DateTime
          ; content : string
          }
 
 let new_ = { realm=Unchecked.defaultof<_>
-           ; author=0
+           ; id=0
+           ; name=null
            ; createdAt=Unchecked.defaultof<_>
            ; content=null
            }
 
 let realm_ = (fun {realm=r} -> r), (fun r t -> {t with realm=r})
-let author_ = (fun {author=a} -> a), (fun a t -> {t with author=a})
+let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
+let name_ = (fun {name=n} -> n), (fun n t -> {t with name=n})
 let createdAt_ = (fun {createdAt=c} -> c), (fun c t -> {t with createdAt=c})
 let content_ = (fun {content=c} -> c), (fun c t -> {t with content=c})
