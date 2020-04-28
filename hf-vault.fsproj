@@ -10,6 +10,22 @@
     <Compile Include="$(SourcesDir)/Realm.fs"/>
     <Compile Include="$(SourcesDir)/Optics.fsi"/>
     <Compile Include="$(SourcesDir)/Optics.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Author.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Author.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfUser.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfUser.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Post.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Post.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfPost.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfPost.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Theme.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Theme.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfTheme.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfTheme.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/Thread.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/Thread.fs"/>
+    <Compile Include="$(SourcesDir)/Dto/HfThread.fsi"/>
+    <Compile Include="$(SourcesDir)/Dto/HfThread.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Util.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Util.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Post.fsi"/>
@@ -20,14 +36,8 @@
     <Compile Include="$(SourcesDir)/Forum/Theme.fs"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fsi"/>
     <Compile Include="$(SourcesDir)/Forum/Root.fs"/>
-    <Compile Include="$(SourcesDir)/Dto/Author.fsi"/>
-    <Compile Include="$(SourcesDir)/Dto/Author.fs"/>
-    <Compile Include="$(SourcesDir)/Dto/HfUser.fsi"/>
-    <Compile Include="$(SourcesDir)/Dto/HfUser.fs"/>
-    <Compile Include="$(SourcesDir)/Dto/Theme.fsi"/>
-    <Compile Include="$(SourcesDir)/Dto/Theme.fs"/>
-    <Compile Include="$(SourcesDir)/Dto/HfTheme.fsi"/>
-    <Compile Include="$(SourcesDir)/Dto/HfTheme.fs"/>
+    <Compile Include="$(SourcesDir)/Db.fsi"/>
+    <Compile Include="$(SourcesDir)/Db.fs"/>
     <Compile Include="$(SourcesDir)/HfVault.fs"/>
   </ItemGroup>
   <ItemGroup>
