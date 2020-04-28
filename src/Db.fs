@@ -84,3 +84,35 @@ let ``insert HfUser and Author or get id`` hfUser = async
                | Some id -> return Some (hfUser |> id^=userId_)
                | _       -> return None
 }
+
+let ``insert new HfThread and Thread`` hfThread = async
+{ let threadId_ = Domain.HfThread.thread_ >-> Domain.Thread.id_ in
+  let dto = hfThread |> (snd Domain.HfThread.dto_) |> Dto.HfThread.toDb in
+  use insert = DbTypes.Db.CreateCommand<"""
+           WITH new_thread AS (INSERT INTO thread (id, author, created_at,
+                                                   updated_at, theme, name,
+                                                   open, sticky)
+                                    VALUES (DEFAULT, @author, @created_at,
+                                            @updated_at, @theme, @name, @open,
+                                            @sticky)
+                                 RETURNING id)
+    INSERT INTO hf_thread (hfid, realm, thread)
+         VALUES (@hfid, @realm, (SELECT id FROM new_thread))
+      RETURNING thread
+  """, SingleRow=true>(connRuntime) in
+  match!
+    insert.AsyncExecute
+      ( hfid=dto.hfid
+      , realm=dto.realm
+      , author=dto.thread.author.id
+      , created_at=dto.thread.createdAt
+      , updated_at=dto.thread.updatedAt
+      , theme=dto.thread.theme.id
+      , name=dto.thread.name
+      , ``open``=dto.thread.``open``
+      , sticky=dto.thread.sticky
+      )
+  with
+  | Some id -> return Some (hfThread |> id^=threadId_)
+  | _       -> return None
+}

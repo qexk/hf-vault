@@ -23,3 +23,6 @@ val insertHfThemeAndTheme : Domain.HfTheme.T
 
 val ``insert HfUser and Author or get id`` : Domain.HfUser.T
                                           -> Domain.HfUser.T option Async
+
+val ``insert new HfThread and Thread`` : Domain.HfThread.T
+                                      -> Domain.HfThread.T option Async
