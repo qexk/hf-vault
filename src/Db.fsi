@@ -20,3 +20,6 @@ module HfVault.Db
 
 val insertHfThemeAndTheme : Domain.HfTheme.T
                          -> Domain.HfTheme.T option Async
+
+val ``insert HfUser and Author or get id`` : Domain.HfUser.T
+                                          -> Domain.HfUser.T option Async

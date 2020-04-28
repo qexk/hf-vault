@@ -51,3 +51,36 @@ let insertHfThemeAndTheme hfTheme = async
   with
   | _ -> return None
 }
+
+let ``insert HfUser and Author or get id`` hfUser = async
+{ let dto = hfUser |> (snd Domain.HfUser.dto_) |> Dto.HfUser.toDb in
+  let userId_ = Domain.HfUser.author_ >-> Domain.Author.id_ in
+  use selectId = DbTypes.Db.CreateCommand<"""
+    SELECT author.id
+      FROM author
+           INNER JOIN hf_user
+           ON hf_user.author = author.id
+     WHERE hf_user.hfid = @hfid
+           AND hf_user.realm = @realm
+     LIMIT 1
+  """, SingleRow=true>(connRuntime) in
+  match! selectId.AsyncExecute(hfid=dto.hfid, realm=dto.realm) with
+  | Some id -> return Some (hfUser |> id^=userId_)
+  | _       -> use insert = DbTypes.Db.CreateCommand<"""
+                        WITH new_user AS (INSERT INTO author (id, name)
+                                               VALUES (DEFAULT, @name)
+                                            RETURNING id)
+                 INSERT INTO hf_user (hfid, realm, author)
+                      VALUES (@hfid, @realm, (SELECT id FROM new_user))
+                   RETURNING author
+               """, SingleRow=true>(connRuntime) in
+               match!
+                 insert.AsyncExecute
+                   ( hfid=dto.hfid
+                   , realm=dto.realm
+                   , name=dto.author.name
+                   )
+               with
+               | Some id -> return Some (hfUser |> id^=userId_)
+               | _       -> return None
+}
