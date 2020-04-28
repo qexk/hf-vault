@@ -29,3 +29,6 @@ val id_ : Lens<T, int>
 val name_ : Lens<T, string>
 val createdAt_ : Lens<T, System.DateTime>
 val content_ : Lens<T, string>
+
+val makeNewHfUser : T
+                 -> HfVault.Domain.HfUser.T

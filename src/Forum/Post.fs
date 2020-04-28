@@ -21,6 +21,7 @@ module HfVault.Forum.Post
 #light "off"
 
 open System
+open Aether.Operators
 open HfVault
 
 type T = { realm : Realm.T
@@ -42,3 +43,13 @@ let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
 let name_ = (fun {name=n} -> n), (fun n t -> {t with name=n})
 let createdAt_ = (fun {createdAt=c} -> c), (fun c t -> {t with createdAt=c})
 let content_ = (fun {content=c} -> c), (fun c t -> {t with content=c})
+
+let makeNewHfUser xx =
+  let author =
+    Domain.Author.new_
+    |> xx.name^=Domain.Author.name_
+  in
+  Domain.HfUser.new_
+  |> author^=Domain.HfUser.author_
+  |> xx.id^=Domain.HfUser.hfid_
+  |> xx.realm^=Domain.HfUser.realm_
