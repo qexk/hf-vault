@@ -44,5 +44,6 @@
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23"/>
     <PackageReference Include="Aether" Version="8.3.1"/>
     <PackageReference Include="FSharp.Data.Npgsql" Version="0.2.6-beta"/>
+    <PackageReference Include="Logary" Version="5.0.0"/>
   </ItemGroup>
 </Project>
