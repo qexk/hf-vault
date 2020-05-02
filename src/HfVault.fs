@@ -29,17 +29,19 @@ open HfVault.Optics
 let userAgent = "hf-vault-bot/0.0.0 (+https://github.com/Aksamyt/hf-vault)"
 
 type Options = { realm : Realm.T
+               ; mustExit : bool
                } with
   static member new_ = { realm=Realm.FR
+                       ; mustExit=false
                        }
 
   static member usage = """Usage:
-  dotnet hf-vault.exe [options]
+  dotnet <path-to-hf-vault> [options]
 
 Options:
   -r REALM, --realm REALM  Set the realm to scrape.
                            [type: FR | EN | ES, default: FR]
-  """
+"""
 end
 
 let rec parseArgv o = function
@@ -48,6 +50,7 @@ let rec parseArgv o = function
     | Some r -> parseArgv {o with realm=r} tl
     | None   -> Error (r + ": invalid realm")
     end
+| ("-h"|"--help")::_ -> Ok {o with mustExit=true}
 | jaj::_ -> Error (jaj + ": unknown option")
 | []     -> Ok o
 
@@ -145,18 +148,18 @@ let ``scrape it!`` o = async
           ()
         done
   } in
-  let! _ = themes.[0] |> work in
-  // let! _ = themes |> Array.map work |> Async.Parallel in
+  let! _ = themes |> Array.map work |> Async.Parallel in
   return ()
 }
 
 [<EntryPoint>]
 let main argv =
   match parseArgv Options.new_ (Array.toList argv) with
-  | Error e -> Printf.eprintfn "error: %s" e; -1
-  | Ok o    -> try ``scrape it!`` o |> Async.RunSynchronously; 0 with
-               | e -> Printf.eprintfn
-                        "fatal error: %s (%A)"
-                        e.Message
-                        e.TargetSite;
-                      -1
+  | Error e            -> Printf.eprintfn "error: %s" e; -1
+  | Ok {mustExit=true} -> System.Console.Write(Options.usage); 0
+  | Ok o               -> try ``scrape it!`` o |> Async.RunSynchronously; 0 with
+                          | e -> Printf.eprintfn
+                                   "fatal error: %s (%A)"
+                                   e.Message
+                                   e.TargetSite;
+                                 -1
