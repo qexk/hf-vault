@@ -116,3 +116,29 @@ let ``insert new HfThread and Thread`` hfThread = async
   | Some id -> return Some (hfThread |> id^=threadId_)
   | _       -> return None
 }
+
+let ``insert new HfPost and Post`` hfPost = async
+{ let postId_ = Domain.HfPost.post_ >-> Domain.Post.id_ in
+  let dto = hfPost |> (snd Domain.HfPost.dto_) |> Dto.HfPost.toDb in
+  use insert = DbTypes.Db.CreateCommand<"""
+           WITH new_post AS (INSERT INTO post (id, author, created_at,
+                                               message, thread)
+                                  VALUES (DEFAULT, @author, @created_at,
+                                          @message, @thread)
+                               RETURNING id)
+    INSERT INTO hf_post (realm, post)
+         VALUES (@realm, (SELECT id FROM new_post))
+      RETURNING post
+  """, SingleRow=true>(connRuntime) in
+  match!
+    insert.AsyncExecute
+      ( realm=dto.realm
+      , author=dto.post.author.id
+      , created_at=dto.post.createdAt
+      , message=dto.post.message
+      , thread=dto.post.thread
+      )
+  with
+  | Some id -> return Some (hfPost |> id^=postId_)
+  | _       -> return None
+}

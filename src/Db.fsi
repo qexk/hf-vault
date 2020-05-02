@@ -26,3 +26,6 @@ val ``insert HfUser and Author or get id`` : Domain.HfUser.T
 
 val ``insert new HfThread and Thread`` : Domain.HfThread.T
                                       -> Domain.HfThread.T option Async
+
+val ``insert new HfPost and Post`` : Domain.HfPost.T
+                                  -> Domain.HfPost.T option Async
