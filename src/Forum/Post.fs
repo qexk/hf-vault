@@ -28,7 +28,7 @@ type T = { realm : Realm.T
          ; id : int
          ; name : string
          ; createdAt : DateTime
-         ; content : string
+         ; content : HtmlAgilityPack.HtmlNode
          }
 
 let new_ = { realm=Unchecked.defaultof<_>
@@ -42,7 +42,7 @@ let realm_ = (fun {realm=r} -> r), (fun r t -> {t with realm=r})
 let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
 let name_ = (fun {name=n} -> n), (fun n t -> {t with name=n})
 let createdAt_ = (fun {createdAt=c} -> c), (fun c t -> {t with createdAt=c})
-let content_ = (fun {content=c} -> c), (fun c t -> {t with content=c})
+let content_ : Aether.Lens<_, _> = (fun {content=c} -> c), (fun c t -> {t with content=c})
 
 let makeNewHfUser xx =
   let author =

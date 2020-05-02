@@ -90,7 +90,6 @@ let applyDate t posts =
     if dateChunkNode.IsSome && authorId.IsSome && contentNode.IsSome
     then let dateChunk = dateChunkNode.Value.InnerText in
          let authorId = authorId.Value in
-         let content = contentNode.Value.InnerHtml in
          let () =
            while
              let repr = sprintf "%s%i" dateChunk year in
@@ -111,13 +110,13 @@ let applyDate t posts =
                     ) |> not
            do year <- year - 1 done
          in
-         acc <- {|date=date;content=content;id=authorId;name=authorName|}::acc
+         acc <- {|date=date;content=contentNode.Value;id=authorId;name=authorName|}::acc
   done;
   acc
 
 let makePost
   realm
-  (data:{| id: int; name: string; content: string; date: DateTime |})
+  (data:{| id: int; name: string; content: HtmlAgilityPack.HtmlNode; date: DateTime |})
 =
   Post.new_
   |> realm^=Post.realm_
