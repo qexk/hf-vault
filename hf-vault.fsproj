@@ -4,6 +4,7 @@
     <TargetFramework>netcoreapp3.0</TargetFramework>
     <RootNamespace>hf_vault</RootNamespace>
     <SourcesDir>src</SourcesDir>
+    <ServerGarbageCollection>true</ServerGarbageCollection>
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="$(SourcesDir)/DbTypes.fs"/>
@@ -38,11 +39,13 @@
     <Compile Include="$(SourcesDir)/Forum/Root.fs"/>
     <Compile Include="$(SourcesDir)/Db.fsi"/>
     <Compile Include="$(SourcesDir)/Db.fs"/>
+    <Compile Include="$(SourcesDir)/Logging.fs"/>
     <Compile Include="$(SourcesDir)/HfVault.fs"/>
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="HtmlAgilityPack" Version="1.11.23"/>
     <PackageReference Include="Aether" Version="8.3.1"/>
     <PackageReference Include="FSharp.Data.Npgsql" Version="0.2.6-beta"/>
+    <PackageReference Include="Logary" Version="5.0.0"/>
   </ItemGroup>
 </Project>

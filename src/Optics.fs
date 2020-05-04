@@ -43,7 +43,11 @@ module HtmlNode = begin
   open HtmlAgilityPack
 
   let nodes_ (xpath:Xml.XPath.XPathExpression) : Lens<HtmlNode, _> =
-    ( (fun doc -> doc.SelectNodes(xpath) :> HtmlNode seq)
+    ( ( fun doc ->
+          match doc.SelectNodes(xpath) :> HtmlNode seq with
+          | null -> Seq.empty
+          | seq  -> seq
+      )
     , fun _ _ -> failwith "unimplemented"
     )
 

@@ -32,7 +32,7 @@ let connRuntime =
   with
   | _ -> failwith "Configuration file ‘config.json’ not found or invalid"
 
-let insertHfThemeAndTheme hfTheme = async
+let ``insert new HfTheme and Theme`` hfTheme = async
 { use cmd = DbTypes.Db.CreateCommand<"""
            WITH new_theme AS (INSERT INTO theme (name)
                                    VALUES (@name)
@@ -50,6 +50,23 @@ let insertHfThemeAndTheme hfTheme = async
     return id |> Option.map (fun id -> hfTheme |> id^=themeId_)
   with
   | _ -> return None
+}
+
+let ``insert HfTheme and Theme or get id`` hfTheme = async
+{ let dto = hfTheme |> (snd Domain.HfTheme.dto_) |> Dto.HfTheme.toDb in
+  let themeId_ = Domain.HfTheme.theme_ >-> Domain.Theme.id_ in
+  use cmd = DbTypes.Db.CreateCommand<"""
+    SELECT theme.id
+     FROM theme
+          INNER JOIN hf_theme
+          ON hf_theme.theme = theme.id
+    WHERE hf_theme.hfid = @hfid
+          AND hf_theme.realm = @realm
+    LIMIT 1
+  """, SingleRow=true>(connRuntime) in
+  match! cmd.AsyncExecute(hfid=dto.hfid, realm=dto.realm) with
+  | Some id -> return Some (hfTheme |> id^=themeId_)
+  | _       -> return! ``insert new HfTheme and Theme`` hfTheme
 }
 
 let ``insert HfUser and Author or get id`` hfUser = async
@@ -115,6 +132,23 @@ let ``insert new HfThread and Thread`` hfThread = async
   with
   | Some id -> return Some (hfThread |> id^=threadId_)
   | _       -> return None
+}
+
+let ``insert HfThread and Thread or get id`` hfThread = async
+{ let dto = hfThread |> (snd Domain.HfThread.dto_) |> Dto.HfThread.toDb in
+  let threadId_ = Domain.HfThread.thread_ >-> Domain.Thread.id_ in
+  use cmd = DbTypes.Db.CreateCommand<"""
+    SELECT thread.id
+     FROM thread
+          INNER JOIN hf_thread
+          ON hf_thread.thread = thread.id
+    WHERE hf_thread.hfid = @hfid
+          AND hf_thread.realm = @realm
+    LIMIT 1
+  """, SingleRow=true>(connRuntime) in
+  match! cmd.AsyncExecute(hfid=dto.hfid, realm=dto.realm) with
+  | Some id -> return Some (hfThread |> id^=threadId_)
+  | _       -> return! ``insert new HfThread and Thread`` hfThread
 }
 
 let ``insert new HfPost and Post`` hfPost = async

@@ -18,14 +18,20 @@
 
 module HfVault.Db
 
-val insertHfThemeAndTheme : Domain.HfTheme.T
-                         -> Domain.HfTheme.T option Async
+val ``insert new HfTheme and Theme`` : Domain.HfTheme.T
+                                    -> Domain.HfTheme.T option Async
+
+val ``insert HfTheme and Theme or get id`` : Domain.HfTheme.T
+                                          -> Domain.HfTheme.T option Async
 
 val ``insert HfUser and Author or get id`` : Domain.HfUser.T
                                           -> Domain.HfUser.T option Async
 
 val ``insert new HfThread and Thread`` : Domain.HfThread.T
                                       -> Domain.HfThread.T option Async
+
+val ``insert HfThread and Thread or get id`` : Domain.HfThread.T
+                                            -> Domain.HfThread.T option Async
 
 val ``insert new HfPost and Post`` : Domain.HfPost.T
                                   -> Domain.HfPost.T option Async
