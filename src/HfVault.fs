@@ -22,6 +22,8 @@ module HfVault.__main__
 
 open Aether
 open Aether.Operators
+open Hopac
+open Logary
 open HtmlAgilityPack
 open HfVault
 open HfVault.Optics
@@ -39,8 +41,8 @@ type Options = { realm : Realm.T
   dotnet <path-to-hf-vault> [options]
 
 Options:
-  -r REALM, --realm REALM  Set the realm to scrape.
-                           [type: FR | EN | ES, default: FR]
+  -r, --realm REALM  Set the realm to scrape.
+                     [type: FR | EN | ES, default: FR]
 """
 end
 
@@ -48,14 +50,21 @@ let rec parseArgv o = function
 | ("-r"|"--realm")::r::tl ->
     begin match r^.(Prism.ofEpimorphism String.realm_) with
     | Some r -> parseArgv {o with realm=r} tl
-    | None   -> Error (r + ": invalid realm")
+    | None   -> Result.Error (r + ": invalid realm")
     end
 | ("-h"|"--help")::_ -> Ok {o with mustExit=true}
-| jaj::_ -> Error (jaj + ": unknown option")
+| jaj::_ -> Result.Error (jaj + ": unknown option")
 | []     -> Ok o
 
-let insertThread theme forumThread forumPosts = async
-{ match forumPosts with
+/// THICC boi
+let insertThread theme forumThread forumPosts = job
+{ let logger =
+    PointName.ofArray
+      [|theme^.Domain.Theme.name_; forumThread^.Forum.Thread.name_|]
+    |> Logging.getLogger
+  in
+  do! Logging.logPosts logger forumPosts in
+  match forumPosts with
   | [||]  -> return ()
   | posts ->
       match!
@@ -63,8 +72,9 @@ let insertThread theme forumThread forumPosts = async
         |> Forum.Post.makeNewHfUser
         |> Db.``insert HfUser and Author or get id``
       with
-      | None             -> return ()
+      | None             -> Logging.log logger Warn "Error inserting author"
       | Some firstAuthor ->
+          do! Logging.logInsertUserSuccess logger firstAuthor in
           let firstPostDate = posts.[0]^.Forum.Post.createdAt_ in
           let lastPostDate = posts.[posts.Length - 1]^.Forum.Post.createdAt_ in
           let thread =
@@ -83,19 +93,29 @@ let insertThread theme forumThread forumPosts = async
             |> (forumThread^.Forum.Thread.id_)^=Domain.HfThread.hfid_
             |> thread^=Domain.HfThread.thread_
           in
-          match! Db.``insert new HfThread and Thread`` hfThread with
-          | None             -> return ()
+          match! Db.``insert HfThread and Thread or get id`` hfThread with
+          | None          -> Logging.log logger Warn "Error inserting thread"
           | Some hfThread ->
+              do! Logging.logInsertThreadSuccess logger hfThread in
               let threadId =
                 hfThread^.(Domain.HfThread.thread_ >-> Domain.Thread.id_)
               in
-              for post in forumPosts do
+              for ix = 0 to forumPosts.Length - 1 do
+                let post = forumPosts.[ix] in
+                let logger =
+                  PointName.ofArray
+                    [| theme^.Domain.Theme.name_
+                     ; forumThread^.Forum.Thread.name_
+                     ; sprintf "%i/%i" (ix + 1) forumPosts.Length
+                    |]
+                  |> Logging.getLogger
+                in
                 match!
                   post
                   |> Forum.Post.makeNewHfUser
                   |> Db.``insert HfUser and Author or get id``
                 with
-                | None        -> ()
+                | None        -> Logging.log logger Warn "Error inserting user"
                 | Some hfUser ->
                     let domainPost =
                       Domain.Post.new_
@@ -110,8 +130,14 @@ let insertThread theme forumThread forumPosts = async
                       |> (post^.Forum.Post.realm_)^=Domain.HfPost.realm_
                       |> domainPost^=Domain.HfPost.post_
                     in
-                    let! _ = Db.``insert new HfPost and Post`` hfPost in
-                    ()
+                    try
+                      match! Db.``insert new HfPost and Post`` hfPost with
+                      | None -> Logging.log logger Warn "Error inserting post"
+                      | Some hfPost ->
+                          do! Logging.logInsertPostSuccess logger hfPost in
+                          ()
+                    with
+                    | _ -> Logging.log logger Warn "Error inserting post"
               done;
               return ()
 }
@@ -127,39 +153,53 @@ let insertTheme forumTheme =
     |> (forumTheme^.Forum.Theme.realm_)^=Domain.HfTheme.realm_
     |> theme^=Domain.HfTheme.theme_
   in
-  Db.insertHfThemeAndTheme hfTheme
+  Db.``insert HfTheme and Theme or get id`` hfTheme
 
-let ``scrape it!`` o = async
-{ let web = HtmlWeb(UserAgent="hf-vault") in
+let ``scrape threads`` web forumTheme = job
+{ let logger =
+    Logging.getLogger (PointName.ofSingle (forumTheme^.Forum.Theme.name_))
+  in
+  match! insertTheme forumTheme with
+  | None         -> Logging.log logger Warn "Error inserting"
+  | Some hfTheme ->
+      do! Logging.logInsertThemeSuccess logger hfTheme in
+      let theme = hfTheme^.Domain.HfTheme.theme_ in
+      let forumThreads = Forum.Theme.load web forumTheme in
+      do! Logging.logThreads logger forumThreads in
+      for forumThread in forumThreads do
+        let forumPosts = Forum.Thread.load web forumThread |> List.toArray in
+        do! insertThread theme forumThread forumPosts in
+        ()
+      done
+}
+
+let ``scrape it!`` o = job
+{ let logger = Logging.getLogger (PointName.ofSingle "root") in
+  let web = HtmlWeb(UserAgent=userAgent) in
   let themes =
     match Forum.Root.load web o.realm with
     | Some root -> root^.Forum.Root.themes_
     | _         -> failwith "error loading forum root"
   in
-  let work forumTheme = async
-  { match! insertTheme forumTheme with
-    | None         -> ()
-    | Some hfTheme ->
-        let theme = hfTheme^.Domain.HfTheme.theme_ in
-        let forumThreads = Forum.Theme.load web forumTheme in
-        for forumThread in forumThreads do
-          let forumPosts = Forum.Thread.load web forumThread |> List.toArray in
-          let! _ = insertThread theme forumThread forumPosts in
-          ()
-        done
-  } in
-  let! _ = themes |> Array.map work |> Async.Parallel in
-  return ()
+  do! Logging.logThemes logger themes in
+  Logging.log logger Info "Begin parallelized work";
+  do! themes |> Array.map (``scrape threads`` web) |> Job.conIgnore in
+  Logging.log logger Info "End parallelized work"
 }
 
 [<EntryPoint>]
 let main argv =
-  match parseArgv Options.new_ (Array.toList argv) with
-  | Error e            -> Printf.eprintfn "error: %s" e; -1
-  | Ok {mustExit=true} -> System.Console.Write(Options.usage); 0
-  | Ok o               -> try ``scrape it!`` o |> Async.RunSynchronously; 0 with
-                          | e -> Printf.eprintfn
-                                   "fatal error: %s (%A)"
-                                   e.Message
-                                   e.TargetSite;
-                                 -1
+  use _quitLogary =
+    {new System.IDisposable with member _.Dispose() = Logging.stop ()}
+  in
+  let logger = Logging.getLogger (PointName.ofSingle "main") in
+  try
+    match parseArgv Options.new_ (Array.toList argv) with
+    | Result.Error e     -> failwith e
+    | Ok {mustExit=true} -> System.Console.Write(Options.usage); 0
+    | Ok o               -> ``scrape it!`` o |> run; 0
+  with
+  | e -> Message.eventError "top-level exception"
+         |> Message.addExn e
+         |> logger.logSimple;
+         -1
