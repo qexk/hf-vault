@@ -20,6 +20,8 @@
   * [Building](#building)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
+  * [Overview](#overview)
+  * [Libraries used](#libraries-used)
 * [Acknowledgements](#acknowledgements)
 * [License](#license)
 
@@ -133,10 +135,26 @@ See the [open issues] for a list of proposed features (and known issues).
 Pull requests are welcome! Tests are not mandatory, but a good typed representation of the business logic is always better.
 
 1. Fork the project
-2. Create your feature/hotfix branch: `git checkout -b feature/be-faster` or `git checkout -b hotfix/stop-choking-on-nulls`
-3. Commit your changes following these [commit guidelines]
-4. Push your branch
-5. Open a Pull Request
+2. Switch to the develop branch: `git checkout develop`
+3. Create your feature/hotfix branch: `git checkout -b feature/be-faster` or `git checkout -b hotfix/stop-choking-on-nulls`
+4. Commit your changes following these [commit guidelines]
+5. Push your branch
+6. Open a Pull Request
+
+### Overview
+
+- [`./src`](./src): all the source files.
+- [`./src/HfVault.fs`](./src/HfVault.fs): entry point and crawler implementation.
+- [`./src/Forum`](./src/Forum): these modules represent a hierarchical layer of the forum (root > theme > thread > post), every module provides a type and a `load` function.
+- [`./src/Dto`](./src/Dto): these modules represent the logic using types and help validate the data before inserting it into the database.
+
+### Libraries used
+
+- [HtmlAgilityPack]: parsing HTML
+- [Aether]: optics
+- [FSharp.Data.Npgsql]: PostgreSQL type provider
+- [Logary]: logging
+- [Hopac]: mainly used for logging, the rest is classic F# Async
 
 ## Acknowledgements
 
@@ -155,5 +173,10 @@ Distributed under the [GNU General Public License v3].
 [Hammerfest]: http://hfest.net/
 [open issues]: https://github.com/Aksamyt/hf-vault/issues
 [commit guidelines]: https://chris.beams.io/posts/git-commit/
+[HtmlAgilityPack]: https://html-agility-pack.net/documentation
+[Aether]: https://xyncro.tech/aether/
+[FSharp.Data.Npgsql]: https://github.com/demetrixbio/FSharp.Data.Npgsql
+[Logary]: https://logary.tech
+[Hopac]: https://github.com/Hopac/Hopac/blob/master/Docs/Programming.md
 [Eternalfest]: https://eternalfest.net
 [GNU General Public License v3]: https://www.gnu.org/licenses/gpl-3.0.html
