@@ -28,7 +28,7 @@ open HtmlAgilityPack
 open HfVault
 open HfVault.Optics
 
-let userAgent = "hf-vault-bot/0.0.0 (+https://github.com/Aksamyt/hf-vault)"
+let userAgent = "hf-vault-bot/1.0.0 (+https://github.com/Aksamyt/hf-vault)"
 
 type Options = { realm : Realm.T
                ; mustExit : bool
