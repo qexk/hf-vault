@@ -150,11 +150,11 @@ Pull requests are welcome! Tests are not mandatory, but a good typed representat
 
 ### Libraries used
 
-- [HtmlAgilityPack]: parsing HTML
-- [Aether]: optics
-- [FSharp.Data.Npgsql]: PostgreSQL type provider
-- [Logary]: logging
-- [Hopac]: mainly used for logging, the rest is classic F# Async
+- [HtmlAgilityPack]\: parsing HTML
+- [Aether]\: optics
+- [FSharp.Data.Npgsql]\: PostgreSQL type provider
+- [Logary]\: logging
+- [Hopac]\: mainly used for logging, the rest is classic F# Async
 
 ## Acknowledgements
 
