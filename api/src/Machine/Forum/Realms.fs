@@ -16,15 +16,31 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+module Api.Machine.Forum.Realms
 #nowarn "62"
 #light "off"
 
 open Freya.Core
-open Freya.Routers.Uri.Template
+open Freya.Machines.Http
 open Freya.Types.Http
+open Thoth.Json.Net
+open Api
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms"         Machine.Forum.Realms.machine
+let getAllRealms = freya
+{ let! rows = Freya.fromJob (Db.``select all stored realms`` ()) in
+  let json = rows
+          |> (snd Domain.RealmList.dto_)
+          |> Dto.RealmList.jsonEncoder
+          |> Encode.toString 0 in
+  return { Data=System.Text.Encoding.UTF8.GetBytes json
+         ; Description={ Charset=Some Charset.Utf8
+                       ; Encodings=None
+                       ; MediaType=Some MediaType.Json
+                       ; Languages=None
+                       }
+         }
+}
+
+let machine = freyaMachine
+{ handleOk getAllRealms
 }

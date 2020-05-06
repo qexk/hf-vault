@@ -16,15 +16,28 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+module Api.Db
 #nowarn "62"
 #light "off"
 
-open Freya.Core
-open Freya.Routers.Uri.Template
-open Freya.Types.Http
+open Hopac
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms"         Machine.Forum.Realms.machine
+let connRuntime =
+  try
+    let stream = System.IO.File.OpenRead("config.json") in
+    let root = System.Text.Json.JsonDocument.Parse(stream) in
+    root.RootElement.GetProperty("ConnectionStrings")
+                    .GetProperty("hf-vault")
+                    .GetString()
+  with
+  | _ -> failwith "Configuration file ‘config.json’ not found or invalid"
+
+let ``select all stored realms`` () = job
+{ use select = DbTypes.Db.CreateCommand<"""
+    SELECT DISTINCT realm
+               FROM hf_theme
+  """>(connRuntime) in
+  let! rows = select.AsyncExecute() in
+  let realms = rows |> List.map (fun realm -> {Dto.Realm.value=realm}) in
+  return {Dto.RealmList.realms=realms} |> (fst Domain.RealmList.dto_)
 }

@@ -16,15 +16,15 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+module Api.DbTypes
 #nowarn "62"
 #light "off"
 
-open Freya.Core
-open Freya.Routers.Uri.Template
-open Freya.Types.Http
+open FSharp.Data.Npgsql
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms"         Machine.Forum.Realms.machine
-}
+[<Literal>] let private CONN_KEY = "hf-vault";;
+[<Literal>] let private CONFIG = __SOURCE_DIRECTORY__ + "/development.settings.json";;
+
+type Db = NpgsqlConnection<Connection=CONN_KEY, Config=CONFIG>
+
+type Realm = Db.``public``.Types.realm
