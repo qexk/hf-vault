@@ -16,16 +16,27 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+module Api.Machine.Pervasives
 #nowarn "62"
 #light "off"
 
 open Freya.Core
+open Freya.Core.Operators
 open Freya.Routers.Uri.Template
 open Freya.Types.Http
+open Api
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms"         Machine.Forum.Realms.machine
-; route GET "/forum/realms/{realm}/themes" Machine.Forum.Themes.machine
-}
+type MediaType with
+  static member HalJson =
+    MediaType (Type "application", SubType "hal+json", Parameters Map.empty)
+end
+
+let realm_ = Route.atom_ "realm"
+
+let realm = freya
+{ let inline ( >>= ) v f = Option.bind f v in
+  let! realm = !.realm_ in
+  return realm
+     >>= Dto.Realm.ofString
+     >>= (fst Domain.Realm.dto_)
+} |> Freya.memo

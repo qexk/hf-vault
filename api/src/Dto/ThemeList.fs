@@ -16,16 +16,29 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+namespace Api
 #nowarn "62"
 #light "off"
 
-open Freya.Core
-open Freya.Routers.Uri.Template
-open Freya.Types.Http
+namespace Api.Dto
+open Thoth.Json.Net
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms"         Machine.Forum.Realms.machine
-; route GET "/forum/realms/{realm}/themes" Machine.Forum.Themes.machine
-}
+type ThemeList = {themes : Theme list} with
+  static member jsonEncoder = fun xx ->
+    xx.themes |> List.map Theme.jsonEncoder |> Encode.list
+end
+
+namespace Api.Domain
+open Api
+
+type ThemeList = {themes : Theme list} with
+  static member dto_ =
+    ( ( fun (dto:Dto.ThemeList) ->
+          { themes=dto.themes
+                |> List.map (fst Theme.dto_)
+                |> List.choose id
+          }
+      )
+    , (fun xx -> {Dto.ThemeList.themes=List.map (snd Theme.dto_) xx.themes})
+    )
+end

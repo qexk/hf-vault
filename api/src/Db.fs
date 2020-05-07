@@ -41,3 +41,25 @@ let ``select all stored realms`` () = job
   let realms = rows |> List.map (fun realm -> {Dto.Realm.value=realm}) in
   return {Dto.RealmList.realms=realms} |> (fst Domain.RealmList.dto_)
 }
+
+let ``select all themes from realm`` realm = job
+{ use select = DbTypes.Db.CreateCommand<"""
+    SELECT theme.name, hf.hfid
+      FROM theme
+           LEFT JOIN hf_theme AS hf
+           ON theme.id = hf.theme
+     WHERE hf.realm = @realm
+  """>(connRuntime) in
+  let dtoRealm = realm |> (snd Domain.Realm.dto_) in
+  let dbRealm = dtoRealm.value in
+  let! rows = select.AsyncExecute(dbRealm) in
+  let themes = rows
+            |> List.map
+                 ( fun theme ->
+                     { Dto.Theme.name=theme.name
+                     ; Dto.Theme.hfid=theme.hfid
+                     ; Dto.Theme.realm=dtoRealm
+                     }
+                 ) in
+  return {Dto.ThemeList.themes=themes} |> (fst Domain.ThemeList.dto_)
+}
