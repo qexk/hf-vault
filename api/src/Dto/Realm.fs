@@ -35,7 +35,7 @@ type Realm = {value : DbTypes.Realm} with
   static member toString = fun xx -> string xx.value
 
   static member jsonEncoder = fun xx ->
-    Encode.object ["realm", Encode.string (string xx.value)]
+    Encode.object [string xx.value, Encode.nil]
 end
 
 namespace Api.Domain
