@@ -27,8 +27,8 @@ open Thoth.Json.Net
 open Api
 
 let getAllRealms = freya
-{ let! rows = Freya.fromJob (Db.``select all stored realms`` ()) in
-  let json = rows
+{ let! realms = Freya.fromJob (Db.``select all stored realms`` ()) in
+  let json = realms
           |> (snd Domain.RealmList.dto_)
           |> Dto.RealmList.jsonEncoder
           |> Encode.toString 0 in
