@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Machine.Forum.Themes
+namespace Api.Machine.Forum
 #nowarn "62"
 #light "off"
 
@@ -28,28 +28,35 @@ open Freya.Types.Http
 open Thoth.Json.Net
 open Api
 
-let getThemes = freya
-{ let! realm = Option.get <!> Machine.Pervasives.realm in
-  let! themes = Db.``select all themes from realm`` realm |> Freya.fromJob in
-  let json = themes
-          |> (snd Domain.ThemeList.dto_)
-          |> Dto.ThemeList.jsonEncoder
-          |> Encode.toString 0 in
-  return { Data=System.Text.Encoding.UTF8.GetBytes json
-         ; Description={ Charset=Some Charset.Utf8
-                       ; Encodings=None
-                       ; MediaType=Some MediaType.Json
-                       ; Languages=None
-                       }
-         }
-}
+[<AutoOpen>]
+module private __ThemesImpl__ = begin
+  let ``200`` = freya
+  { let! realm = Option.get <!> Machine.Pervasives.realm in
+    let! themes = Db.``select all themes from realm`` realm |> Freya.fromJob in
+    let json = themes
+            |> (snd Domain.ThemeList.dto_)
+            |> Dto.ThemeList.jsonEncoder
+            |> Encode.toString 0 in
+    return { Data=System.Text.Encoding.UTF8.GetBytes json
+           ; Description={ Charset=Some Charset.Utf8
+                         ; Encodings=None
+                         ; MediaType=Some MediaType.Json
+                         ; Languages=None
+                         }
+           }
+  }
 
-let ``404`` =
-  Represent.text "Allowed realm values are “FR”, “EN”, or “ES”"
+  let ``404`` =
+    Represent.text "Allowed realm values are “FR”, “EN”, or “ES”"
 
-let machine = freyaMachine
-{ exists (Option.isSome <!> Machine.Pervasives.realm)
-; handleOk getThemes
-; handleNotFound ``404``
-; cors
-}
+  let machine = freyaMachine
+  { exists (Option.isSome <!> Machine.Pervasives.realm)
+  ; handleOk ``200``
+  ; handleNotFound ``404``
+  ; cors
+  }
+end
+
+type ThemesMachine = Themes with
+  static member Pipeline(_) = HttpMachine.Pipeline(machine)
+end

@@ -16,7 +16,7 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Machine.Forum.Realms
+namespace Api.Machine.Forum
 #nowarn "62"
 #light "off"
 
@@ -27,22 +27,29 @@ open Freya.Types.Http
 open Thoth.Json.Net
 open Api
 
-let getAllRealms = freya
-{ let! realms = Freya.fromJob (Db.``select all stored realms`` ()) in
-  let json = realms
-          |> (snd Domain.RealmList.dto_)
-          |> Dto.RealmList.jsonEncoder
-          |> Encode.toString 0 in
-  return { Data=System.Text.Encoding.UTF8.GetBytes json
-         ; Description={ Charset=Some Charset.Utf8
-                       ; Encodings=None
-                       ; MediaType=Some MediaType.Json
-                       ; Languages=None
-                       }
-         }
-}
+[<AutoOpen>]
+module private __RealmsImpl__ = begin
+  let ``200`` = freya
+  { let! realms = Freya.fromJob (Db.``select all stored realms`` ()) in
+    let json = realms
+            |> (snd Domain.RealmList.dto_)
+            |> Dto.RealmList.jsonEncoder
+            |> Encode.toString 0 in
+    return { Data=System.Text.Encoding.UTF8.GetBytes json
+           ; Description={ Charset=Some Charset.Utf8
+                         ; Encodings=None
+                         ; MediaType=Some MediaType.Json
+                         ; Languages=None
+                         }
+           }
+  }
 
-let machine = freyaMachine
-{ handleOk getAllRealms
-; cors
-}
+  let machine = freyaMachine
+  { handleOk ``200``
+  ; cors
+  }
+end
+
+type RealmsMachine = Realms with
+  static member Pipeline(_) = HttpMachine.Pipeline(machine)
+end
