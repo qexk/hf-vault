@@ -63,3 +63,54 @@ let ``select all themes from realm`` realm = job
                  ) in
   return {Dto.ThemeList.themes=themes} |> (fst Domain.ThemeList.dto_)
 }
+
+let ``get stats of theme`` realm theme = job
+{ use query = DbTypes.Db.CreateCommand<"""
+     WITH all_posts AS (SELECT post.id post, post.created_at,
+                               thread.id thread, thread.name thread_name,
+                               post.author
+                          FROM hf_theme
+                               JOIN theme
+                               ON theme.id = hf_theme.theme
+                               JOIN thread
+                               ON thread.theme = theme.id
+                               JOIN post
+                               ON post.thread = thread.id
+                         WHERE hf_theme.hfid = @theme
+                               AND hf_theme.realm = @realm),
+          newest as (SELECT *
+                       FROM all_posts
+                   ORDER BY created_at DESC
+                      LIMIT 1),
+          count as (SELECT count(all_posts.post) posts,
+                           count(distinct all_posts.thread) threads
+                      FROM all_posts)
+    SELECT count.posts, count.threads, newest.created_at last_update,
+           hf_thread.hfid thread, newest.thread_name,
+           hf_user.hfid author, author.name author_name
+      FROM count, newest
+           JOIN author
+           ON author.id = newest.author
+           JOIN hf_user
+           ON hf_user.author = author.id
+           JOIN hf_thread
+           ON hf_thread.thread = newest.thread
+  """, SingleRow=true>(connRuntime) in
+  let dtoRealm = realm |> (snd Domain.Realm.dto_) in
+  let dbRealm = dtoRealm.value in
+  match! query.AsyncExecute(theme=theme, realm=dbRealm) with
+  | None     -> return None
+  | Some row -> return (row.posts, row.threads)
+                ||> Option.map2
+                      ( fun posts threads ->
+                          { Dto.ThemeStats.posts=posts
+                          ; Dto.ThemeStats.threads=threads
+                          ; Dto.ThemeStats.lastUpdate=row.last_update
+                          ; Dto.ThemeStats.thread=row.thread
+                          ; Dto.ThemeStats.threadName=row.thread_name
+                          ; Dto.ThemeStats.author=row.author
+                          ; Dto.ThemeStats.authorName=row.author_name
+                          }
+                      )
+                 |> Option.map (fst Domain.ThemeStats.dto_)
+}

@@ -40,3 +40,15 @@ let realm = freya
      >>= Dto.Realm.ofString
      >>= (fst Domain.Realm.dto_)
 } |> Freya.memo
+
+let themeHfid_ = Route.atom_ "themeHfid"
+
+let themeHfid = freya
+{ let inline ( >>= ) v f = Option.bind f v in
+  match! !.themeHfid_ with
+  | None          -> return None
+  | Some rawTheme -> let mutable theme = Unchecked.defaultof<int> in
+                     return if System.Int32.TryParse(rawTheme, &theme)
+                            then Some theme
+                            else None
+} |> Freya.memo

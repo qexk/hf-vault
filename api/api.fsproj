@@ -12,10 +12,12 @@
     <Compile Include="$(SourcesDir)/Dto/RealmList.fs" />
     <Compile Include="$(SourcesDir)/Dto/Theme.fs" />
     <Compile Include="$(SourcesDir)/Dto/ThemeList.fs" />
+    <Compile Include="$(SourcesDir)/Dto/ThemeStats.fs" />
     <Compile Include="$(SourcesDir)/Db.fs" />
     <Compile Include="$(SourcesDir)/Machine/Pervasives.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Realms.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes.fs" />
+    <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Stats.fs" />
     <Compile Include="$(SourcesDir)/Router.fs" />
     <Compile Include="$(SourcesDir)/KestrelInterop.fs" />
     <Compile Include="$(SourcesDir)/Program.fs" />
