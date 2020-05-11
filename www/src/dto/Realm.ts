@@ -24,7 +24,7 @@ function stringOfImpl(i: Impl): string {
 
 export default class Realm {
   constructor(
-    public value: Impl,
+    public readonly value: Impl,
   ) {}
 
   static fromJSON(o: any): Realm|null {
@@ -45,12 +45,21 @@ export default class Realm {
     return { [stringOfImpl(this.value)]: null };
   }
 
-  getFlag(): string {
+  get flag(): string {
     switch (this.value) {
       case Impl.EN: return '🏴󠁧󠁢󠁥󠁮󠁧󠁿';
       case Impl.ES: return '🇪🇸';
       case Impl.FR:
       default: return '🇫🇷';
+    }
+  }
+
+  get host(): string {
+    switch (this.value) {
+      case Impl.EN: return 'http://www.hfest.net'
+      case Impl.ES: return 'http://www.hammerfest.es'
+      case Impl.FR:
+      default: return 'http://www.hammerfest.fr'
     }
   }
 

@@ -70,16 +70,14 @@ export default class RealmSelect extends Vue {
     const res = await fetch('http://localhost:5000/forum/realms');
     const json = await res.json();
     const realms = List.fromJSON(Realm, json);
-    if (realms != null) {
-      this.options = realms.list.map(r => {
-        return {
-          text: r.getFlag(),
-          value: r,
-        }
-      });
-      this.emitEvent(realms);
-      this.state = State.Ready;
-    }
+    this.options = realms.list.map(r => {
+      return {
+        text: r.flag,
+        value: r,
+      }
+    });
+    this.emitEvent(realms);
+    this.state = State.Ready;
   }
 
   beforeMount() {

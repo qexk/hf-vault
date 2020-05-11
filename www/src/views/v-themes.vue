@@ -1,0 +1,41 @@
+<template>
+  <section class="section">
+    <template v-for="theme in sortedThemes">
+      <theme-row :key="theme.hfid" :theme="theme" />
+      <hr :key="theme.hfid" />
+    </template>
+  </section>
+</template>
+
+<script lang="ts">
+import { Component, Prop, Vue } from 'vue-property-decorator';
+import ThemeRow from '@/components/theme-row.vue';
+import Realm from '@/dto/Realm';
+import Theme from '@/dto/Theme';
+import List from '@/dto/List';
+
+@Component({
+  components: {
+    ThemeRow,
+  },
+})
+export default class VThemes extends Vue {
+  @Prop() private realm!: Realm;
+
+  themes: Theme[] = [];
+
+  private async fetchThemes() {
+    const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes`);
+    const json = await res.json();
+    this.themes = List.fromJSON(Theme, json).list;
+  }
+
+  get sortedThemes() {
+    return [...this.themes].sort((a, b) => a.hfid - b.hfid);
+  }
+
+  beforeMount() {
+    this.fetchThemes();
+  }
+}
+</script>
