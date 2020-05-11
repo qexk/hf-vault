@@ -23,6 +23,7 @@ module Api.Machine.Forum.Themes
 open Freya.Core
 open Freya.Core.Operators
 open Freya.Machines.Http
+open Freya.Machines.Http.Cors
 open Freya.Types.Http
 open Thoth.Json.Net
 open Api
@@ -50,4 +51,5 @@ let machine = freyaMachine
 { exists (Option.isSome <!> Machine.Pervasives.realm)
 ; handleOk getThemes
 ; handleNotFound ``404``
+; cors
 }

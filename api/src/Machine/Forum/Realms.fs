@@ -22,6 +22,7 @@ module Api.Machine.Forum.Realms
 
 open Freya.Core
 open Freya.Machines.Http
+open Freya.Machines.Http.Cors
 open Freya.Types.Http
 open Thoth.Json.Net
 open Api
@@ -43,4 +44,5 @@ let getAllRealms = freya
 
 let machine = freyaMachine
 { handleOk getAllRealms
+; cors
 }
