@@ -34,7 +34,7 @@ type Realm = {value : DbTypes.Realm} with
 
   static member toString = fun xx -> string xx.value
 
-  static member jsonEncoder = fun xx ->
+  static member jsonEncoder(xx) =
     Encode.object [string xx.value, Encode.nil]
 end
 
@@ -44,7 +44,7 @@ open Api
 type Realm = FR
            | EN
            | ES with
-  static member dto_ =
+  static member dto_() =
     ( ( fun (dto:Dto.Realm) ->
           match dto.value with
           | DbTypes.Realm.FR -> Some FR

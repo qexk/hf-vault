@@ -9,9 +9,8 @@
   <ItemGroup>
     <Compile Include="$(SourcesDir)/DbTypes.fs" />
     <Compile Include="$(SourcesDir)/Dto/Realm.fs" />
-    <Compile Include="$(SourcesDir)/Dto/RealmList.fs" />
     <Compile Include="$(SourcesDir)/Dto/Theme.fs" />
-    <Compile Include="$(SourcesDir)/Dto/ThemeList.fs" />
+    <Compile Include="$(SourcesDir)/Dto/List.fs" />
     <Compile Include="$(SourcesDir)/Dto/ThemeStats.fs" />
     <Compile Include="$(SourcesDir)/Db.fs" />
     <Compile Include="$(SourcesDir)/Machine/Pervasives.fs" />

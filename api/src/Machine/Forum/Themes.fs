@@ -33,9 +33,14 @@ module private __ThemesImpl__ = begin
   let ``200`` = freya
   { let! realm = Option.get <!> Machine.Pervasives.realm in
     let! themes = Db.``select all themes from realm`` realm |> Freya.fromJob in
+    let inline toDto t =
+      Domain.List.dto_<Dto.Theme, Domain.Theme>()
+      |> snd
+      <| t
+    in
     let json = themes
-            |> (snd Domain.ThemeList.dto_)
-            |> Dto.ThemeList.jsonEncoder
+            |> toDto
+            |> Dto.List.jsonEncoder<Dto.Theme>
             |> Encode.toString 0 in
     return { Data=System.Text.Encoding.UTF8.GetBytes json
            ; Description={ Charset=Some Charset.Utf8

@@ -38,7 +38,7 @@ let realm = freya
   let! realm = !.realm_ in
   return realm
      >>= Dto.Realm.ofString
-     >>= (fst Domain.Realm.dto_)
+     >>= fst (Domain.Realm.dto_())
 } |> Freya.memo
 
 let themeHfid_ = Route.atom_ "themeHfid"

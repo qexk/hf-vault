@@ -27,7 +27,7 @@ type Theme = { name : string
              ; hfid : int
              ; realm : Realm
              } with
-  static member jsonEncoder = fun xx ->
+  static member jsonEncoder(xx) =
     Encode.object
       [ "name", Encode.string xx.name
       ; "hfid", Encode.int xx.hfid
@@ -39,16 +39,16 @@ namespace Api.Domain
 open Api
 
 type Theme = T of (string * int * Realm) with
-  static member dto_ =
+  static member dto_() =
     ( ( fun (dto:Dto.Theme) ->
-          match dto.realm |> fst Realm.dto_ with
+          match dto.realm |> fst (Realm.dto_()) with
           | Some realm -> Some (T (dto.name, dto.hfid, realm))
           | None       -> None
       )
     , ( fun (T (name, hfid, realm)) ->
           { Dto.Theme.name=name
           ; Dto.Theme.hfid=hfid
-          ; Dto.Theme.realm=realm |> snd Realm.dto_
+          ; Dto.Theme.realm=realm |> snd (Realm.dto_())
           }
       )
     )

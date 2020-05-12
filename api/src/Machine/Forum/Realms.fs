@@ -31,9 +31,14 @@ open Api
 module private __RealmsImpl__ = begin
   let ``200`` = freya
   { let! realms = Freya.fromJob (Db.``select all stored realms`` ()) in
+    let inline toDto t =
+      Domain.List.dto_<Dto.Realm, Domain.Realm>()
+      |> snd
+      <| t
+    in
     let json = realms
-            |> (snd Domain.RealmList.dto_)
-            |> Dto.RealmList.jsonEncoder
+            |> toDto
+            |> Dto.List.jsonEncoder<Dto.Realm>
             |> Encode.toString 0 in
     return { Data=System.Text.Encoding.UTF8.GetBytes json
            ; Description={ Charset=Some Charset.Utf8

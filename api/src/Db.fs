@@ -39,7 +39,11 @@ let ``select all stored realms`` () = job
   """>(connRuntime) in
   let! rows = select.AsyncExecute() in
   let realms = rows |> List.map (fun realm -> {Dto.Realm.value=realm}) in
-  return {Dto.RealmList.realms=realms} |> (fst Domain.RealmList.dto_)
+  let toDomain =
+    Domain.List<Dto.Realm, Domain.Realm>.dto_<Dto.Realm, Domain.Realm>()
+    |> fst
+  in
+  return {Dto.List.list=realms} |> toDomain
 }
 
 let ``select all themes from realm`` realm = job
@@ -50,7 +54,7 @@ let ``select all themes from realm`` realm = job
            ON theme.id = hf.theme
      WHERE hf.realm = @realm
   """>(connRuntime) in
-  let dtoRealm = realm |> (snd Domain.Realm.dto_) in
+  let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
   let dbRealm = dtoRealm.value in
   let! rows = select.AsyncExecute(dbRealm) in
   let themes = rows
@@ -61,7 +65,12 @@ let ``select all themes from realm`` realm = job
                      ; Dto.Theme.realm=dtoRealm
                      }
                  ) in
-  return {Dto.ThemeList.themes=themes} |> (fst Domain.ThemeList.dto_)
+  let toDomain =
+    Domain.List<Dto.Theme, Domain.Theme>.dto_<Dto.Theme, Domain.Theme>()
+    |> fst
+  in
+  return {Dto.List.list=themes} |> toDomain
+}
 }
 
 let ``get stats of theme`` realm theme = job
@@ -96,7 +105,7 @@ let ``get stats of theme`` realm theme = job
            JOIN hf_thread
            ON hf_thread.thread = newest.thread
   """, SingleRow=true>(connRuntime) in
-  let dtoRealm = realm |> (snd Domain.Realm.dto_) in
+  let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
   let dbRealm = dtoRealm.value in
   match! query.AsyncExecute(theme=theme, realm=dbRealm) with
   | None     -> return None
