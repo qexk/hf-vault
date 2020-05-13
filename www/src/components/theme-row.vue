@@ -1,5 +1,5 @@
 <template>
-  <router-link to="#">
+  <router-link :to="'/theme/' + this.theme.hfid">
     <article class="columns is-vcentered hf-theme">
       <div class="column is-narrow">
         <figure class="image is-32x32">
