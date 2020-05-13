@@ -24,6 +24,7 @@
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads/Stats.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads/Posts.fs" />
+    <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads/Self.fs" />
     <Compile Include="$(SourcesDir)/Router.fs" />
     <Compile Include="$(SourcesDir)/KestrelInterop.fs" />
     <Compile Include="$(SourcesDir)/Program.fs" />

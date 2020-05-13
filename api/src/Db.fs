@@ -46,6 +46,40 @@ let ``select all stored realms`` () = job
   return {Dto.List.list=realms} |> toDomain
 }
 
+let ``select thread from realm`` realm hfid = job
+{ use select = DbTypes.Db.CreateCommand<"""
+    SELECT hf_thread.hfid, hf_user.author, author.name author_name,
+           thread.created_at, thread.updated_at, hf_theme.hfid theme,
+           thread.name, thread.open, thread.sticky
+      FROM thread
+           JOIN hf_thread
+           ON hf_thread.thread = thread.id
+           JOIN hf_theme
+           ON hf_theme.theme = thread.theme
+           JOIN author
+           ON author.id = thread.author
+           JOIN hf_user
+           ON hf_user.author = author.id
+     WHERE hf_thread.realm = @realm
+           AND hf_thread.hfid = @hfid
+  """, SingleRow=true>(connRuntime) in
+  let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
+  let dbRealm = dtoRealm.value in
+  match! select.AsyncExecute(realm=dbRealm, hfid=hfid) with
+  | None     -> return None
+  | Some row -> return { Dto.Thread.thread=row.hfid
+                       ; Dto.Thread.realm=dtoRealm
+                       ; Dto.Thread.theme=row.theme
+                       ; Dto.Thread.author=row.author
+                       ; Dto.Thread.authorName=row.author_name
+                       ; Dto.Thread.createdAt=row.created_at
+                       ; Dto.Thread.updatedAt=row.created_at
+                       ; Dto.Thread.name=row.name
+                       ; Dto.Thread.``open``=row.``open``
+                       ; Dto.Thread.sticky=row.sticky
+                       } |> fst (Domain.Thread.dto_())
+}
+
 let ``select theme from realm`` realm hfid = job
 { use select = DbTypes.Db.CreateCommand<"""
     SELECT theme.name

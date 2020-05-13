@@ -33,4 +33,6 @@ let root = freyaRouter
 ; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads{?q*}" Machine.Forum.Themes.Threads
 ; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}/stats" Machine.Forum.Themes.Threads.Stats
 ; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}/posts{?q*}" Machine.Forum.Themes.Threads.Posts
+; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}" Machine.Forum.Themes.Threads.Self
+; route GET "/forum/realms/{realm}/threads/{threadHfid}"                    Machine.Forum.Themes.Threads.Self
 }
