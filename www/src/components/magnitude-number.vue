@@ -42,8 +42,11 @@ export default class ThemeRow extends Vue {
       return this.value;
     }
     const float = this.value / this.scale.m;
-    const fraction = float * 10 % 10 < 1 ? 0 : 1;
-    return float.toFixed(fraction);
+    if (float * 10 % 10 < 1) {
+      return Math.trunc(float);
+    } else {
+      return (Math.trunc(float * 10)) / 10;
+    }
   }
 }
 </script>
