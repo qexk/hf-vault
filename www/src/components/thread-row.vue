@@ -1,5 +1,5 @@
 <template>
-  <router-link :to="`/thread/${this.thread.thread}`">
+  <router-link :to="`/thread/${this.thread.hfid}`">
     <article class="columns is-vcentered hf-thread">
       <div class="column">
         <h2 class="title is-4">

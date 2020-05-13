@@ -1,9 +1,16 @@
 <template>
   <nav class="breadcrumb" aria-label="breadcrumbs">
     <ul>
-      <li :class="{ 'is-active': theme == null}"><router-link to="/">{{ realm.flag }} Forum</router-link></li>
+      <li :class="{ 'is-active': theme == null}">
+        <router-link to="/">{{ realm.flag }} Forum</router-link>
+      </li>
       <template v-if="theme != null">
-        <li :class="{ 'is-active': thread == null}"><router-link :to="'/theme/' + theme.hfid">{{ theme.name }}</router-link></li>
+        <li :class="{ 'is-active': thread == null}">
+          <router-link :to="'/theme/' + theme.hfid">{{ theme.name }}</router-link>
+        </li>
+        <li v-if="thread != null" class="is-active">
+          <router-link :to="'/thread/' + thread.hfid">{{ thread.name }}</router-link>
+        </li>
       </template>
     </ul>
   </nav>

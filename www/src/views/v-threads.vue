@@ -68,6 +68,7 @@ export default class VThreads extends Vue {
       }
     }
     this.$emit('theme', this.theme);
+    this.$emit('thread', null);
   }
 
   @Watch('page')
@@ -86,10 +87,6 @@ export default class VThreads extends Vue {
 
   beforeMount() {
     this.setTheme().then(() => this.fetchThreads());
-  }
-
-  destroyed() {
-    this.$emit('theme', null);
   }
 
   prevPage() {

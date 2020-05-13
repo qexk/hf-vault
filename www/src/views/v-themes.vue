@@ -36,6 +36,8 @@ export default class VThemes extends Vue {
 
   beforeMount() {
     this.fetchThemes();
+    this.$emit('theme', null);
+    this.$emit('thread', null);
   }
 }
 </script>
