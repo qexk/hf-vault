@@ -23,7 +23,7 @@
           </span>
         </a>
       </div>
-      <div v-if="stats != null" class="column is-1 has-text-centered is-hidden-touch">
+      <div class="column is-1 has-text-centered is-hidden-touch">
         <div class="level-item">
           <div>
             <magnitude-number class="title is-4" :value="stats.posts" />
@@ -31,7 +31,7 @@
           </div>
         </div>
       </div>
-      <div v-if="stats != null" class="column is-1 has-text-centered is-hidden-touch">
+      <div class="column is-1 has-text-centered is-hidden-touch">
         <div class="level-item">
           <div>
             <magnitude-number class="title is-4" :value="stats.threads" />
@@ -39,7 +39,7 @@
           </div>
         </div>
       </div>
-      <div v-if="stats != null" class="column is-3 is-hidden-touch">
+      <div class="column is-3 is-hidden-touch">
         <p>
           <router-link :to="threadUrl">{{ stats.threadName }}</router-link><br />
           <span class="has-text-grey">{{ stats.lastUpdate.toFormat('ff') }}</span> · <a :href="authorUrl">{{ stats.authorName }}</a>
@@ -64,20 +64,20 @@ export default class ThemeRow extends Vue {
   @Prop() private theme!: Theme;
 
   hfurl = `${this.theme.realm.host}/forum.html/theme/${this.theme.hfid}/`;
-  stats: ThemeStats|null = null;
+  stats: ThemeStats = ThemeStats.empty;
 
   get authorUrl() {
-    return `${this.theme.realm.host}/user.html/${this.stats!.author}`;
+    return `${this.theme.realm.host}/user.html/${this.stats.author}`;
   }
 
   get threadUrl() {
-    return `/theme/${this.theme.hfid}/thread/${this.stats!.thread}`;
+    return `/theme/${this.theme.hfid}/thread/${this.stats.thread}`;
   }
 
   private async fetchStats() {
     const res = await fetch(`http://localhost:5000/forum/realms/${this.theme.realm.toString()}/themes/${this.theme.hfid}/stats`);
     const json = await res.json();
-    this.stats = ThemeStats.fromJSON(json);
+    this.stats = ThemeStats.fromJSON(json) ?? ThemeStats.empty;
   }
 
   beforeMount() {

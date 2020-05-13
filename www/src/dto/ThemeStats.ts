@@ -1,4 +1,3 @@
-import Realm from './Realm';
 import { DateTime } from 'luxon';
 
 export default class ThemeStats {
@@ -52,4 +51,8 @@ export default class ThemeStats {
       authorName: this.authorName,
     };
   }
+
+  static empty: Readonly<ThemeStats> = Object.freeze(
+    new ThemeStats(0, 0, DateTime.fromMillis(0), 0, 'loading...', 0, 'loading...')
+  );
 }

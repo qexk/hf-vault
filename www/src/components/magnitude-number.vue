@@ -5,18 +5,19 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 
-  interface Scale {
-    prefix: string;
-    m: number;
-  }
+interface Scale {
+  prefix: string;
+  m: number;
+}
 
 @Component
 export default class ThemeRow extends Vue {
   @Prop() private value!: number;
 
-  private getScale(): Scale {
+  @Watch('value')
+  private get scale(): Scale {
     if (this.value >= 1e15) {
       return { prefix: 'P', m: 1e15 };
     } else if (this.value >= 1e12) {
@@ -32,8 +33,6 @@ export default class ThemeRow extends Vue {
     }
   }
 
-  private scale: Scale = this.getScale();
-
   get prefix() {
     return this.scale.prefix;
   }
@@ -44,7 +43,7 @@ export default class ThemeRow extends Vue {
     }
     const float = this.value / this.scale.m;
     const fraction = float * 10 % 10 < 1 ? 0 : 1;
-    return (this.value / this.scale.m).toFixed(fraction);
+    return float.toFixed(fraction);
   }
 }
 </script>
