@@ -26,7 +26,9 @@ open Freya.Types.Http
 
 let root = freyaRouter
 { ()
-; route GET "/forum/realms"                                   Machine.Forum.Realms
-; route GET "/forum/realms/{realm}/themes"                    Machine.Forum.Themes
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/stats"  Machine.Forum.Themes.Stats
+; route GET "/forum/realms" Machine.Forum.Realms
+; route GET "/forum/realms/{realm}/themes" Machine.Forum.Themes
+; route GET "/forum/realms/{realm}/themes/{themeHfid}" Machine.Forum.Themes.Self
+; route GET "/forum/realms/{realm}/themes/{themeHfid}/stats" Machine.Forum.Themes.Stats
+; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads{?q*}" Machine.Forum.Themes.Threads
 }

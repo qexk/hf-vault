@@ -46,6 +46,25 @@ let ``select all stored realms`` () = job
   return {Dto.List.list=realms} |> toDomain
 }
 
+let ``select theme from realm`` realm hfid = job
+{ use select = DbTypes.Db.CreateCommand<"""
+    SELECT theme.name
+      FROM theme
+           LEFT JOIN hf_theme AS hf
+           ON hf.theme = theme.id
+     WHERE hf.realm = @realm
+           AND hf.hfid = @hfid
+  """, SingleRow=true>(connRuntime) in
+  let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
+  let dbRealm = dtoRealm.value in
+  match! select.AsyncExecute(realm=dbRealm, hfid=hfid) with
+  | None -> return None
+  | Some name -> return { Dto.Theme.name=name
+                        ; Dto.Theme.hfid=hfid
+                        ; Dto.Theme.realm=dtoRealm
+                        } |> fst (Domain.Theme.dto_())
+}
+
 let ``select all themes from realm`` realm = job
 { use select = DbTypes.Db.CreateCommand<"""
     SELECT theme.name, hf.hfid
@@ -70,6 +89,55 @@ let ``select all themes from realm`` realm = job
     |> fst
   in
   return {Dto.List.list=themes} |> toDomain
+}
+
+let ``select all threads from theme`` realm theme limit offset = job
+{ use select = DbTypes.Db.CreateCommand<"""
+      SELECT hf_thread.hfid, hf_user.author, author.name author_name,
+             thread.created_at, thread.updated_at, thread.theme, thread.name,
+             thread.open, thread.sticky
+        FROM thread
+             JOIN hf_thread
+             ON hf_thread.thread = thread.id
+             JOIN hf_theme
+             ON hf_theme.theme = thread.theme
+             JOIN author
+             ON author.id = thread.author
+             JOIN hf_user
+             ON hf_user.author = author.id
+       WHERE hf_thread.realm = @realm
+             AND hf_theme.hfid = @theme
+    ORDER BY thread.updated_at DESC
+       LIMIT @limit
+      OFFSET @offset
+  """>(connRuntime) in
+  let dtoRealm = realm |> snd (Domain.Realm.dto_()) in
+  let dbRealm = dtoRealm.value in
+  let limit = match limit with
+              | Some l when l > 0 && l < 50 -> int64 l
+              | _                           -> 50L in
+  let offset = defaultArg offset 0 |> int64 in
+  let! rows = select.AsyncExecute(realm=dbRealm, theme=theme, limit=limit, offset=offset) in
+  let threads = rows
+             |> List.map
+                  ( fun thread ->
+                      { Dto.Thread.thread=thread.hfid
+                      ; Dto.Thread.realm=dtoRealm
+                      ; Dto.Thread.theme=thread.theme
+                      ; Dto.Thread.author=thread.author
+                      ; Dto.Thread.authorName=thread.author_name
+                      ; Dto.Thread.createdAt=thread.created_at
+                      ; Dto.Thread.updatedAt=thread.created_at
+                      ; Dto.Thread.name=thread.name
+                      ; Dto.Thread.``open``=thread.``open``
+                      ; Dto.Thread.sticky=thread.sticky
+                      }
+                  ) in
+  let toDomain =
+    Domain.List<Dto.Thread, Domain.Thread>.dto_<Dto.Thread, Domain.Thread>()
+    |> fst
+  in
+  return {Dto.List.list=threads} |> toDomain
 }
 }
 

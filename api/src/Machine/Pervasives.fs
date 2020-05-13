@@ -52,3 +52,15 @@ let themeHfid = freya
                             then Some theme
                             else None
 } |> Freya.memo
+
+let threadHfid_ = Route.atom_ "threadHfid"
+
+let threadHfid = freya
+{ let inline ( >>= ) v f = Option.bind f v in
+  match! !.threadHfid_ with
+  | None           -> return None
+  | Some rawThread -> let mutable thread = Unchecked.defaultof<int> in
+                      return if System.Int32.TryParse(rawThread, &thread)
+                             then Some thread
+                             else None
+} |> Freya.memo
