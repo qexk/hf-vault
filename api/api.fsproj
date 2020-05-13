@@ -13,6 +13,7 @@
     <Compile Include="$(SourcesDir)/Dto/Thread.fs" />
     <Compile Include="$(SourcesDir)/Dto/List.fs" />
     <Compile Include="$(SourcesDir)/Dto/ThemeStats.fs" />
+    <Compile Include="$(SourcesDir)/Dto/ThreadStats.fs" />
     <Compile Include="$(SourcesDir)/Db.fs" />
     <Compile Include="$(SourcesDir)/Machine/Pervasives.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Realms.fs" />
@@ -20,6 +21,7 @@
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Self.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Stats.fs" />
     <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads.fs" />
+    <Compile Include="$(SourcesDir)/Machine/Forum/Themes/Threads/Stats.fs" />
     <Compile Include="$(SourcesDir)/Router.fs" />
     <Compile Include="$(SourcesDir)/KestrelInterop.fs" />
     <Compile Include="$(SourcesDir)/Program.fs" />

@@ -139,6 +139,47 @@ let ``select all threads from theme`` realm theme limit offset = job
   in
   return {Dto.List.list=threads} |> toDomain
 }
+
+let ``get stats of thread`` realm theme thread = job
+{ use query = DbTypes.Db.CreateCommand<"""
+      with all_posts AS (SELECT post.created_at, post.author
+                           FROM hf_theme
+                                JOIN theme
+                                ON theme.id = hf_theme.theme
+                                JOIN thread
+                                ON thread.theme = theme.id
+                                JOIN hf_thread
+                                ON hf_thread.thread = thread.id
+                                JOIN post
+                                ON post.thread = thread.id
+                          WHERE hf_theme.realm = @realm
+                                AND hf_theme.hfid = @theme
+                                AND hf_thread.hfid = @thread
+                       ORDER BY post.created_at DESC)
+    SELECT created_at last_update,
+           hf_user.hfid author, author.name authorName,
+           c.count posts
+      FROM all_posts
+           CROSS JOIN (SELECT COUNT(*) count FROM all_posts) AS c
+           JOIN author
+           ON author.id = all_posts.author
+           JOIN hf_user
+           ON hf_user.author = author.id
+     LIMIT 1;
+  """, SingleRow=true>(connRuntime) in
+  let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
+  let dbRealm = dtoRealm.value in
+  match! query.AsyncExecute(theme=theme, realm=dbRealm, thread=thread) with
+  | None -> return None
+  | Some row -> return row.posts
+                    |> Option.map
+                         ( fun posts ->
+                             { Dto.ThreadStats.posts=posts
+                             ; Dto.ThreadStats.lastUpdate=row.last_update
+                             ; Dto.ThreadStats.author=row.author
+                             ; Dto.ThreadStats.authorName=row.authorname
+                             } |> fst Domain.ThreadStats.dto_
+                         )
 }
 
 let ``get stats of theme`` realm theme = job

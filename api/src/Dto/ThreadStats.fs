@@ -16,20 +16,30 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+namespace Api
 #nowarn "62"
 #light "off"
 
-open Freya.Core
-open Freya.Routers.Uri.Template
-open Freya.Types.Http
+namespace Api.Dto
+open Thoth.Json.Net
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms" Machine.Forum.Realms
-; route GET "/forum/realms/{realm}/themes" Machine.Forum.Themes
-; route GET "/forum/realms/{realm}/themes/{themeHfid}" Machine.Forum.Themes.Self
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/stats" Machine.Forum.Themes.Stats
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads{?q*}" Machine.Forum.Themes.Threads
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}/stats" Machine.Forum.Themes.Threads.Stats
-}
+type ThreadStats = { posts : int64
+                   ; lastUpdate : System.DateTime
+                   ; author : int
+                   ; authorName : string
+                   } with
+  static member jsonEncoder = fun xx ->
+    Encode.object
+      [ "posts", Encode.int64 xx.posts
+      ; "lastUpdate", Encode.datetime xx.lastUpdate
+      ; "author", Encode.int xx.author
+      ; "authorName", Encode.string xx.authorName
+      ]
+end
+
+namespace Api.Domain
+open Api
+
+type ThreadStats = T of Dto.ThreadStats with
+  static member dto_ = (T, (fun (T dto) -> dto))
+end
