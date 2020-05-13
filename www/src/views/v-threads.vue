@@ -27,7 +27,7 @@
       </div>
     </nav>
     <article class="section">
-      <thread-row v-for="thread in sortedThreads" :key="thread.thread" :thread="thread" />
+      <thread-row v-for="thread in sortedThreads" :key="thread.thread" :realm="realm" :theme="theme" :thread="thread" />
     </article>
   </section>
 </template>
