@@ -1,7 +1,11 @@
 <template>
   <section class="section">
-    <nav class="level">
-      <div class="level-left"></div>
+    <nav class="level is-marginless">
+      <div class="level-left">
+        <div class="level-item">
+          <h1 v-if="theme != null" class="title is-3">{{ theme.name }}</h1>
+        </div>
+      </div>
       <div class="level-right">
         <div class="field has-addons">
           <p class="control">
@@ -22,7 +26,9 @@
         </div>
       </div>
     </nav>
-    <thread-row v-for="thread in sortedThreads" :key="thread.thread" :thread="thread" />
+    <article class="section">
+      <thread-row v-for="thread in sortedThreads" :key="thread.thread" :thread="thread" />
+    </article>
   </section>
 </template>
 
@@ -30,6 +36,7 @@
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import ThreadRow from '@/components/thread-row.vue';
 import Realm from '@/dto/Realm';
+import Theme from '@/dto/Theme';
 import Thread from '@/dto/Thread';
 import List from '@/dto/List';
 
@@ -43,21 +50,32 @@ export default class VThreads extends Vue {
 
   threads: Thread[] = [];
 
-  themeId: number|null = null;
+  theme: Theme|null = null;
 
   page = 0;
 
-  private setThemeId() {
+  private async setTheme() {
     const id = parseInt(this.$route.params['theme']);
-    this.themeId = isNaN(id) ? null : id;
+    if (isNaN(id)) {
+      this.theme = null;
+    } else {
+      try {
+        const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${id}`);
+        const json = await res.json();
+        this.theme = Theme.fromJSON(json);
+      } catch {
+        this.theme = null;
+      }
+    }
+    this.$emit('theme', this.theme);
   }
 
   @Watch('page')
   private async fetchThreads() {
-    if (this.themeId == null) {
+    if (this.theme == null) {
       return;
     }
-    const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.themeId}/threads?offset=${this.offset}&limit=10`);
+    const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads?offset=${this.offset}&limit=10`);
     const json = await res.json();
     const threads = List.fromJSON(Thread, json).list;
     if (threads.length === 0) {
@@ -67,8 +85,11 @@ export default class VThreads extends Vue {
   }
 
   beforeMount() {
-    this.setThemeId();
-    this.fetchThreads();
+    this.setTheme().then(() => this.fetchThreads());
+  }
+
+  destroyed() {
+    this.$emit('theme', null);
   }
 
   prevPage() {

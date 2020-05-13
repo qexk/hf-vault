@@ -11,6 +11,11 @@
             </a>
           </section>
           <section class="navbar-menu is-active">
+            <section class="navbar-start">
+              <div class="navbar-item">
+                <nav-breadcrumb v-if="realm != null" :realm="realm" :theme="theme" />
+              </div>
+            </section>
             <section class="navbar-end">
               <div class="navbar-item">
                 <realm-select @realm="setRealm" />
@@ -21,7 +26,7 @@
       </nav>
     </header>
     <main class="container">
-      <router-view v-if="realm != null" :realm="realm" />
+      <router-view v-if="realm != null" :realm="realm" @theme="setTheme"/>
     </main>
   </div>
 </template>
@@ -29,18 +34,26 @@
 <script lang="ts">
 import { Component, Vue } from 'vue-property-decorator';
 import RealmSelect from '@/components/realm-select.vue';
+import NavBreadcrumb from '@/components/nav-breadcrumb.vue';
 import Realm from '@/dto/Realm';
+import Theme from '@/dto/Theme';
 
 @Component({
   components: {
     RealmSelect,
+    NavBreadcrumb,
   },
 })
 export default class Forum extends Vue {
   realm: Realm|null = null;
+  theme: Theme|null = null;
 
   setRealm(msg: Realm|null) {
     this.realm = msg;
+  }
+
+  setTheme(msg: Theme|null) {
+    this.theme = msg;
   }
 }
 </script>
