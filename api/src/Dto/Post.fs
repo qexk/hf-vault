@@ -16,21 +16,33 @@
     along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *)
 
-module Api.Router
+namespace Api
 #nowarn "62"
 #light "off"
 
-open Freya.Core
-open Freya.Routers.Uri.Template
-open Freya.Types.Http
+namespace Api.Dto
+open System
+open Thoth.Json.Net
 
-let root = freyaRouter
-{ ()
-; route GET "/forum/realms" Machine.Forum.Realms
-; route GET "/forum/realms/{realm}/themes" Machine.Forum.Themes
-; route GET "/forum/realms/{realm}/themes/{themeHfid}" Machine.Forum.Themes.Self
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/stats" Machine.Forum.Themes.Stats
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads{?q*}" Machine.Forum.Themes.Threads
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}/stats" Machine.Forum.Themes.Threads.Stats
-; route GET "/forum/realms/{realm}/themes/{themeHfid}/threads/{threadHfid}/posts{?q*}" Machine.Forum.Themes.Threads.Posts
-}
+type Post = { post : int
+            ; author : int
+            ; authorName : string
+            ; createdAt : DateTime
+            ; message : string
+            } with
+  static member jsonEncoder(xx) =
+    Encode.object
+      [ "post", Encode.int xx.post
+      ; "author", Encode.int xx.author
+      ; "authorName", Encode.string xx.authorName
+      ; "createdAt", Encode.datetime xx.createdAt
+      ; "message", Encode.string xx.message
+      ]
+end
+
+namespace Api.Domain
+open Api
+
+type Post = T of Dto.Post with
+  static member dto_() = (T >> Some, (fun (T dto) -> dto))
+end

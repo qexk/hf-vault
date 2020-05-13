@@ -91,6 +91,61 @@ let ``select all themes from realm`` realm = job
   return {Dto.List.list=themes} |> toDomain
 }
 
+let ``select all posts from thread`` realm theme thread limit offset = job
+{ use select = DbTypes.Db.CreateCommand<"""
+      SELECT post.id, post.created_at, post.message,
+             hf_user.hfid author, author.name author_name
+        FROM thread
+             JOIN hf_thread
+             ON hf_thread.thread = thread.id
+             JOIN hf_theme
+             ON hf_theme.theme = thread.theme
+             JOIN post
+             ON post.thread = thread.id
+             JOIN author
+             ON author.id = post.author
+             JOIN hf_user
+             ON hf_user.author = author.id
+       WHERE hf_thread.realm = @realm
+             AND hf_theme.hfid = @theme
+             AND hf_thread.hfid = @thread
+    ORDER BY post.created_at ASC
+       LIMIT @limit
+      OFFSET @offset;
+  """>(connRuntime) in
+  let dtoRealm = realm |> snd (Domain.Realm.dto_()) in
+  let dbRealm = dtoRealm.value in
+  let limit = match limit with
+              | Some l when l > 0 && l < 50 -> int64 l
+              | _                           -> 50L in
+  let offset = defaultArg offset 0 |> int64 in
+  let! rows =
+    select.AsyncExecute
+      ( realm=dbRealm
+      , theme=theme
+      , thread=thread
+      , limit=limit
+      , offset=offset
+      )
+  in
+  let posts = rows
+           |> List.map
+                ( fun post ->
+                    { Dto.Post.post=post.id
+                    ; Dto.Post.author=post.author
+                    ; Dto.Post.authorName=post.author_name
+                    ; Dto.Post.createdAt=post.created_at
+                    ; Dto.Post.message=post.message
+                    }
+                )
+  in
+  let toDomain =
+    Domain.List<Dto.Post, Domain.Post>.dto_<Dto.Post, Domain.Post>()
+    |> fst
+  in
+  return {Dto.List.list=posts} |> toDomain
+}
+
 let ``select all threads from theme`` realm theme limit offset = job
 { use select = DbTypes.Db.CreateCommand<"""
       SELECT hf_thread.hfid, hf_user.author, author.name author_name,
