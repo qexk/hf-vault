@@ -6,6 +6,7 @@ export default class Thread {
     public readonly hfid: number,
     public readonly realm: Realm,
     public readonly theme: number,
+    public readonly posts: number,
     public readonly author: number,
     public readonly authorName: string,
     public readonly createdAt: DateTime,
@@ -31,6 +32,7 @@ export default class Thread {
       && realm != null
       && o.thread !== void 0 && typeof o.thread === 'number'
       && o.theme !== void 0 && typeof o.theme === 'number'
+      && o.posts !== void 0 && typeof o.posts === 'number'
       && o.author !== void 0 && typeof o.author === 'number'
       && o.authorName !== void 0 && typeof o.authorName === 'string'
       && o.name !== void 0 && typeof o.name === 'string'
@@ -41,6 +43,7 @@ export default class Thread {
         o.thread,
         realm,
         o.theme,
+        o.posts,
         o.author,
         o.authorName,
         createdAt,
@@ -57,6 +60,7 @@ export default class Thread {
       thread: this.hfid,
       realm: this.realm,
       theme: this.theme,
+      posts: this.posts,
       author: this.author,
       authorName: this.authorName,
       createdAt: this.createdAt,

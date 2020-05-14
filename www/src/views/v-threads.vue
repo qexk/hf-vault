@@ -1,34 +1,13 @@
 <template>
   <section class="section">
-    <nav class="level is-marginless">
+    <nav v-if="theme != null" class="level is-marginless">
       <div class="level-left">
         <div class="level-item">
-          <h1 v-if="theme != null" class="title is-3">{{ theme.name }}</h1>
+          <h1 class="title is-3">{{ theme.name }}</h1>
         </div>
       </div>
       <div class="level-right">
-        <div class="field is-horizontal has-addons">
-          <div class="field-label is-normal">
-            <label class="label">Page</label>
-          </div>
-          <div class="field-body">
-            <p class="control">
-              <a href="#" class="button" :disabled="page === 1" @click="prevPage()">
-                <ion-icon name="chevron-back-outline"></ion-icon>
-                <span class="is-sr-only">Previous page</span>
-              </a>
-            </p>
-            <p class="control">
-              <input style="width: 5em" type="number" class="input" v-model="page">
-            </p>
-            <p class="control">
-              <a href="#" class="button" :disabled="threads.length === 0" @click="nextPage()">
-                <ion-icon name="chevron-forward-outline"></ion-icon>
-                <span class="is-sr-only">Next page</span>
-              </a>
-            </p>
-          </div>
-        </div>
+        <nav-page v-model="page" min="1" :max="maxPage" />
       </div>
     </nav>
     <article class="section">
@@ -40,14 +19,18 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import ThreadRow from '@/components/thread-row.vue';
+import NavPage from '@/components/nav-page.vue';
 import Realm from '@/dto/Realm';
 import Theme from '@/dto/Theme';
 import Thread from '@/dto/Thread';
 import List from '@/dto/List';
 
+const OFFSET = 10;
+
 @Component({
   components: {
     ThreadRow,
+    NavPage,
   },
 })
 export default class VThreads extends Vue {
@@ -84,9 +67,6 @@ export default class VThreads extends Vue {
     const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads?offset=${this.offset}&limit=10`);
     const json = await res.json();
     const threads = List.fromJSON(Thread, json).list;
-    if (threads.length === 0) {
-      return this.prevPage();
-    }
     this.threads = threads;
   }
 
@@ -94,24 +74,16 @@ export default class VThreads extends Vue {
     this.setTheme().then(() => this.fetchThreads());
   }
 
-  prevPage() {
-    if (this.page > 1) {
-      --this.page;
-    }
-  }
-
-  nextPage() {
-    if (this.threads.length > 0) {
-      ++this.page;
-    }
-  }
-
   get sortedThreads() {
     return [...this.threads].sort((a, b) => a < b ? 1 : -1);
   }
 
   get offset() {
-    return (this.page - 1) * 10;
+    return (this.page - 1) * OFFSET;
+  }
+
+  get maxPage() {
+    return Math.ceil(this.theme!.threads / OFFSET);
   }
 }
 </script>

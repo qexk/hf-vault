@@ -1,65 +1,23 @@
 <template>
   <section class="section">
-    <nav class="level is-marginless">
+    <nav v-if="thread != null" class="level is-marginless">
       <div class="level-left">
         <div class="level-item">
-          <h1 v-if="thread != null" class="title is-3">{{ thread.name }}</h1>
+          <h1 class="title is-3">{{ thread.name }}</h1>
         </div>
       </div>
       <div class="level-right">
-        <div class="field is-horizontal has-addons">
-          <div class="field-label is-normal">
-            <label class="label">Page</label>
-          </div>
-          <div class="field-body">
-            <p class="control">
-              <a href="#" class="button" :disabled="page === 1" @click="prevPage()">
-                <ion-icon name="chevron-back-outline"></ion-icon>
-                <span class="is-sr-only">Previous page</span>
-              </a>
-            </p>
-            <p class="control">
-              <input style="width: 5em" type="number" class="input" v-model="page">
-            </p>
-            <p class="control">
-              <a href="#" class="button" :disabled="posts.length === 0" @click="nextPage()">
-                <ion-icon name="chevron-forward-outline"></ion-icon>
-                <span class="is-sr-only">Next page</span>
-              </a>
-            </p>
-          </div>
-        </div>
+        <nav-page v-model="page" min="1" :max="maxPage" />
       </div>
     </nav>
     <article class="section">
       <forum-post v-for="post in sortedPosts" :key="post.id" :realm="realm" :post="post" />
     </article>
-    <nav class="level is-marginless">
+    <nav v-if="thread != null" class="level is-marginless">
       <div class="level-left">
       </div>
       <div class="level-right">
-        <div class="field is-horizontal has-addons">
-          <div class="field-label is-normal">
-            <label class="label">Page</label>
-          </div>
-          <div class="field-body">
-            <p class="control">
-              <a href="#" class="button" :disabled="page === 1" @click="prevPage()">
-                <ion-icon name="chevron-back-outline"></ion-icon>
-                <span class="is-sr-only">Previous page</span>
-              </a>
-            </p>
-            <p class="control">
-              <input style="width: 5em" type="number" class="input" v-model="page">
-            </p>
-            <p class="control">
-              <a href="#" class="button" :disabled="posts.length === 0" @click="nextPage()">
-                <ion-icon name="chevron-forward-outline"></ion-icon>
-                <span class="is-sr-only">Next page</span>
-              </a>
-            </p>
-          </div>
-        </div>
+        <nav-page v-model="page" min="1" :max="maxPage" />
       </div>
     </nav>
   </section>
@@ -68,15 +26,19 @@
 <script lang="ts">
 import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import ForumPost from '@/components/forum-post.vue';
+import NavPage from '@/components/nav-page.vue';
 import Realm from '@/dto/Realm';
 import Theme from '@/dto/Theme';
 import Thread from '@/dto/Thread';
 import Post from '@/dto/Post';
 import List from '@/dto/List';
 
+const OFFSET = 10;
+
 @Component({
   components: {
     ForumPost,
+    NavPage,
   },
 })
 export default class VPosts extends Vue {
@@ -127,9 +89,6 @@ export default class VPosts extends Vue {
     const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads/${this.thread.hfid}/posts?offset=${this.offset}&limit=10`);
     const json = await res.json();
     const posts = List.fromJSON(Post, json).list;
-    if (posts.length === 0) {
-      return this.prevPage();
-    }
     this.posts = posts;
   }
 
@@ -137,24 +96,16 @@ export default class VPosts extends Vue {
     this.setThread().then(() => this.setTheme()).then(() => this.fetchPosts());
   }
 
-  get offset() {
+  get sortedPosts() {
+    return [...this.posts].sort((a, b) => a.createdAt < b.createdAt ? -1 : 1);
+  }
+
+get offset() {
     return (this.page - 1) * 10;
   }
 
-  prevPage() {
-    if (this.page > 1) {
-      --this.page;
-    }
-  }
-
-  nextPage() {
-    if (this.posts.length > 0) {
-      ++this.page;
-    }
-  }
-
-  get sortedPosts() {
-    return [...this.posts].sort((a, b) => a.createdAt < b.createdAt ? -1 : 1);
+  get maxPage() {
+    return Math.ceil(this.thread!.posts / OFFSET);
   }
 }
 </script>
