@@ -34,8 +34,8 @@ let connRuntime =
 
 let ``insert new HfTheme and Theme`` hfTheme = async
 { use cmd = DbTypes.Db.CreateCommand<"""
-           WITH new_theme AS (INSERT INTO theme (name)
-                                   VALUES (@name)
+           WITH new_theme AS (INSERT INTO theme (name, description)
+                                   VALUES (@name, @description)
                                 RETURNING id)
     INSERT INTO hf_theme (hfid, realm, theme)
          VALUES (@hfid, @realm, (SELECT id FROM new_theme))
@@ -45,7 +45,12 @@ let ``insert new HfTheme and Theme`` hfTheme = async
   let themeId_ = Domain.HfTheme.theme_ >-> Domain.Theme.id_ in
   try
     let! id =
-      cmd.AsyncExecute(name=dto.theme.name, hfid=dto.hfid, realm=dto.realm)
+      cmd.AsyncExecute
+        ( name=dto.theme.name
+        , hfid=dto.hfid
+        , realm=dto.realm
+        , description=dto.theme.description
+        )
     in
     return id |> Option.map (fun id -> hfTheme |> id^=themeId_)
   with

@@ -41,6 +41,16 @@ let extractId = Util.extractLinkId
 
 let extractName = Optic.get HtmlNode.innerText_
 
+let extractDesc (node:HtmlNode) =
+  try
+    match node.ParentNode
+              .ParentNode
+              .SelectSingleNode("*[@class='categDesc']") with
+    | null -> ""
+    | node -> node.InnerText
+  with
+  | _ -> ""
+
 let extractTheme realm (node:HtmlNode) =
   extractId node
   |> Option.map
@@ -49,6 +59,7 @@ let extractTheme realm (node:HtmlNode) =
            |> realm^=Theme.realm_
            |> id^=Theme.id_
            |> (extractName node)^=Theme.name_
+           |> (extractDesc node)^=Theme.desc_
        )
 
 let load (web:HtmlWeb) realm =
