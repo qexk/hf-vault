@@ -67,7 +67,7 @@ export default class VThemes extends Vue {
 }
 </script>
 
-<style>
+<style scoped>
 article.media .media-left {
   width: 6rem;
   display: flex;

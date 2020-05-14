@@ -16,7 +16,6 @@ interface Scale {
 export default class ThemeRow extends Vue {
   @Prop() private value!: number;
 
-  @Watch('value')
   private get scale(): Scale {
     if (this.value >= 1e15) {
       return { prefix: 'P', m: 1e15 };

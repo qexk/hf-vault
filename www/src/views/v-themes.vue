@@ -1,9 +1,6 @@
 <template>
   <section class="section">
-    <template v-for="theme in sortedThemes">
-      <theme-row :key="theme.hfid" :theme="theme" />
-      <hr :key="theme.hfid" />
-    </template>
+    <theme-row v-for="theme in sortedThemes" :key="theme.hfid" :theme="theme" />
   </section>
 </template>
 
