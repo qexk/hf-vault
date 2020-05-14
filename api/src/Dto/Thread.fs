@@ -27,6 +27,7 @@ open Thoth.Json.Net
 type Thread = { thread : int
               ; realm : Realm
               ; theme : int
+              ; posts : int64
               ; author : int
               ; authorName : string
               ; createdAt : DateTime
@@ -40,6 +41,7 @@ type Thread = { thread : int
       [ "thread", Encode.int xx.thread
       ; "realm", Realm.jsonEncoder xx.realm
       ; "theme", Encode.int xx.theme
+      ; "posts", Encode.int (int xx.posts)
       ; "author", Encode.int xx.author
       ; "authorName", Encode.string xx.authorName
       ; "createdAt", Encode.datetime xx.createdAt
@@ -51,47 +53,8 @@ type Thread = { thread : int
 end
 
 namespace Api.Domain
-open System
 open Api
 
-type Thread = { thread : int
-              ; realm : Realm
-              ; theme : int
-              ; author : int
-              ; authorName : string
-              ; createdAt : DateTime
-              ; updatedAt : DateTime
-              ; name : string
-              ; ``open`` : bool
-              ; sticky : bool
-              } with
-  static member dto_() =
-    ( ( fun (dto:Dto.Thread) ->
-          match dto.realm |> fst (Realm.dto_()) with
-          | None       -> None
-          | Some realm -> Some { thread=dto.thread
-                               ; realm=realm
-                               ; theme=dto.theme
-                               ; author=dto.author
-                               ; authorName=dto.authorName
-                               ; createdAt=dto.createdAt
-                               ; updatedAt=dto.createdAt
-                               ; name=dto.name
-                               ; ``open``=dto.``open``
-                               ; sticky=dto.sticky
-                               }
-      )
-    , ( fun t -> { Dto.Thread.thread=t.thread
-                 ; Dto.Thread.realm=t.realm |> snd (Realm.dto_())
-                 ; Dto.Thread.theme=t.theme
-                 ; Dto.Thread.author=t.author
-                 ; Dto.Thread.authorName=t.authorName
-                 ; Dto.Thread.createdAt=t.createdAt
-                 ; Dto.Thread.updatedAt=t.createdAt
-                 ; Dto.Thread.name=t.name
-                 ; Dto.Thread.``open``=t.``open``
-                 ; Dto.Thread.sticky=t.sticky
-                 }
-      )
-    )
+type Thread = T of Dto.Thread with
+  static member dto_() = (T >> Some, (fun (T dto) -> dto))
 end

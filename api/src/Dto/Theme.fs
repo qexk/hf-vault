@@ -26,45 +26,33 @@ open Thoth.Json.Net
 type Theme = { name : string
              ; hfid : int
              ; realm : Realm
+             ; threads : int64
              } with
   static member jsonEncoder(xx) =
     Encode.object
       [ "name", Encode.string xx.name
       ; "hfid", Encode.int xx.hfid
       ; "realm", Realm.jsonEncoder xx.realm
+      ; "threads", Encode.int (int xx.threads)
       ]
 end
 
 namespace Api.Domain
 open Api
 
-type Theme = T of (string * int * Realm) with
+type Theme = T of (string * int * Realm * int64) with
   static member dto_() =
     ( ( fun (dto:Dto.Theme) ->
           match dto.realm |> fst (Realm.dto_()) with
-          | Some realm -> Some (T (dto.name, dto.hfid, realm))
+          | Some realm -> Some (T (dto.name, dto.hfid, realm, dto.threads))
           | None       -> None
       )
-    , ( fun (T (name, hfid, realm)) ->
+    , ( fun (T (name, hfid, realm, threads)) ->
           { Dto.Theme.name=name
           ; Dto.Theme.hfid=hfid
           ; Dto.Theme.realm=realm |> snd (Realm.dto_())
+          ; Dto.Theme.threads=threads
           }
       )
-    )
-
-  static member name_ =
-    ( (fun (T (name, _, _)) -> name)
-    , (fun name (T (_, hfid, realm)) -> T (name, hfid, realm))
-    )
-
-  static member hfid_ =
-    ( (fun (T (_, hfid, _)) -> hfid)
-    , (fun hfid (T (name, _, realm)) -> T (name, hfid, realm))
-    )
-
-  static member realm_ =
-    ( (fun (T (_, _, realm)) -> realm)
-    , (fun realm (T (name, hfid, _)) -> T (name, hfid, realm))
     )
 end

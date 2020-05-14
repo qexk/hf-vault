@@ -50,7 +50,10 @@ let ``select thread from realm`` realm hfid = job
 { use select = DbTypes.Db.CreateCommand<"""
     SELECT hf_thread.hfid, hf_user.author, author.name author_name,
            thread.created_at, thread.updated_at, hf_theme.hfid theme,
-           thread.name, thread.open, thread.sticky
+           thread.name, thread.open, thread.sticky,
+           (SELECT COUNT(*)
+              FROM post
+             WHERE post.thread = thread.id) posts
       FROM thread
            JOIN hf_thread
            ON hf_thread.thread = thread.id
@@ -70,6 +73,7 @@ let ``select thread from realm`` realm hfid = job
   | Some row -> return { Dto.Thread.thread=row.hfid
                        ; Dto.Thread.realm=dtoRealm
                        ; Dto.Thread.theme=row.theme
+                       ; Dto.Thread.posts=Option.defaultValue 0L row.posts
                        ; Dto.Thread.author=row.author
                        ; Dto.Thread.authorName=row.author_name
                        ; Dto.Thread.createdAt=row.created_at
@@ -82,30 +86,37 @@ let ``select thread from realm`` realm hfid = job
 
 let ``select theme from realm`` realm hfid = job
 { use select = DbTypes.Db.CreateCommand<"""
-    SELECT theme.name
-      FROM theme
-           LEFT JOIN hf_theme AS hf
-           ON hf.theme = theme.id
-     WHERE hf.realm = @realm
-           AND hf.hfid = @hfid
+      SELECT theme.name, COUNT(thread.id) threads
+        FROM theme
+             LEFT JOIN hf_theme AS hf
+             ON hf.theme = theme.id
+             JOIN thread
+             ON thread.theme = theme.id
+       WHERE hf.realm = @realm
+             AND hf.hfid = @hfid
+    GROUP BY theme.name
   """, SingleRow=true>(connRuntime) in
   let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
   let dbRealm = dtoRealm.value in
   match! select.AsyncExecute(realm=dbRealm, hfid=hfid) with
-  | None -> return None
-  | Some name -> return { Dto.Theme.name=name
-                        ; Dto.Theme.hfid=hfid
-                        ; Dto.Theme.realm=dtoRealm
-                        } |> fst (Domain.Theme.dto_())
+  | None     -> return None
+  | Some row -> return { Dto.Theme.name=row.name
+                       ; Dto.Theme.hfid=hfid
+                       ; Dto.Theme.realm=dtoRealm
+                       ; Dto.Theme.threads=Option.defaultValue 0L row.threads
+                       } |> fst (Domain.Theme.dto_())
 }
 
 let ``select all themes from realm`` realm = job
 { use select = DbTypes.Db.CreateCommand<"""
-    SELECT theme.name, hf.hfid
-      FROM theme
-           LEFT JOIN hf_theme AS hf
-           ON theme.id = hf.theme
-     WHERE hf.realm = @realm
+      SELECT theme.name, hf.hfid, COUNT(thread.id) threads
+        FROM theme
+             JOIN hf_theme AS hf
+             ON theme.id = hf.theme
+             JOIN thread
+             ON thread.theme = theme.id
+       WHERE hf.realm = @realm
+    GROUP BY theme.name, hf.hfid;
   """>(connRuntime) in
   let dtoRealm = realm |> (snd (Domain.Realm.dto_())) in
   let dbRealm = dtoRealm.value in
@@ -116,6 +127,7 @@ let ``select all themes from realm`` realm = job
                      { Dto.Theme.name=theme.name
                      ; Dto.Theme.hfid=theme.hfid
                      ; Dto.Theme.realm=dtoRealm
+                     ; Dto.Theme.threads=Option.defaultValue 0L theme.threads
                      }
                  ) in
   let toDomain =
@@ -213,6 +225,7 @@ let ``select all threads from theme`` realm theme limit offset = job
                       { Dto.Thread.thread=thread.hfid
                       ; Dto.Thread.realm=dtoRealm
                       ; Dto.Thread.theme=thread.theme
+                      ; Dto.Thread.posts=(-1L)
                       ; Dto.Thread.author=thread.author
                       ; Dto.Thread.authorName=thread.author_name
                       ; Dto.Thread.createdAt=thread.created_at
