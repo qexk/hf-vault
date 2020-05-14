@@ -3,7 +3,7 @@
     <article class="columns is-vcentered hf-thread">
       <div class="column">
         <h2 class="title is-4">
-          {{ thread.name }}
+          <span v-html="thread.name"></span>
         </h2>
         <p class="subtitle is-6">
           {{ thread.createdAt.toFormat('ff') }} · <a :href="authorUrl">{{ thread.authorName }}</a>

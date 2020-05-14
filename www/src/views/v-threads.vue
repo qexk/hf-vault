@@ -7,22 +7,27 @@
         </div>
       </div>
       <div class="level-right">
-        <div class="field has-addons">
-          <p class="control">
-            <a href="#" class="button" :disabled="page === 0" @click="prevPage()">
-              <ion-icon name="chevron-back-outline"></ion-icon>
-              <span class="is-sr-only">Previous page</span>
-            </a>
-          </p>
-          <p class="control">
-            <span class="button">{{ page + 1 }}</span>
-          </p>
-          <p class="control">
-            <a href="#" class="button" :disabled="threads.length === 0" @click="nextPage()">
-              <ion-icon name="chevron-forward-outline"></ion-icon>
-              <span class="is-sr-only">Next page</span>
-            </a>
-          </p>
+        <div class="field is-horizontal has-addons">
+          <div class="field-label is-normal">
+            <label class="label">Page</label>
+          </div>
+          <div class="field-body">
+            <p class="control">
+              <a href="#" class="button" :disabled="page === 1" @click="prevPage()">
+                <ion-icon name="chevron-back-outline"></ion-icon>
+                <span class="is-sr-only">Previous page</span>
+              </a>
+            </p>
+            <p class="control">
+              <input style="width: 5em" type="number" class="input" v-model="page">
+            </p>
+            <p class="control">
+              <a href="#" class="button" :disabled="threads.length === 0" @click="nextPage()">
+                <ion-icon name="chevron-forward-outline"></ion-icon>
+                <span class="is-sr-only">Next page</span>
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     </nav>
@@ -52,7 +57,7 @@ export default class VThreads extends Vue {
 
   theme: Theme|null = null;
 
-  page = 0;
+  page = 1;
 
   private async setTheme() {
     const id = parseInt(this.$route.params['theme']);
@@ -90,7 +95,7 @@ export default class VThreads extends Vue {
   }
 
   prevPage() {
-    if (this.page > 0) {
+    if (this.page > 1) {
       --this.page;
     }
   }
@@ -106,7 +111,7 @@ export default class VThreads extends Vue {
   }
 
   get offset() {
-    return this.page * 10;
+    return (this.page - 1) * 10;
   }
 }
 </script>
