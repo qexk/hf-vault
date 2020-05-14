@@ -11,6 +11,9 @@
       </div>
     </nav>
     <article class="section">
+      <div :class="{ 'is-active': loading }" class="hf-loader loader-wrapper">
+        <div class="loader is-loading"></div>
+      </div>
       <forum-post v-for="post in sortedPosts" :key="post.id" :realm="realm" :post="post" />
     </article>
     <nav v-if="thread != null" class="level is-marginless">
@@ -51,6 +54,8 @@ export default class VPosts extends Vue {
 
   page = 1;
 
+  loading = true;
+
   private async setTheme() {
     if (this.thread == null) {
       return;
@@ -83,13 +88,14 @@ export default class VPosts extends Vue {
 
   @Watch('page')
   private async fetchPosts() {
-    if (this.theme == null || this.thread == null) {
-      return;
+    if (this.theme != null && this.thread != null) {
+      this.loading = true;
+      const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads/${this.thread.hfid}/posts?offset=${this.offset}&limit=10`);
+      const json = await res.json();
+      const posts = List.fromJSON(Post, json).list;
+      this.posts = posts;
     }
-    const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads/${this.thread.hfid}/posts?offset=${this.offset}&limit=10`);
-    const json = await res.json();
-    const posts = List.fromJSON(Post, json).list;
-    this.posts = posts;
+    this.loading = false;
   }
 
   beforeMount() {

@@ -68,3 +68,29 @@ export default class Forum extends Vue {
   }
 }
 </script>
+
+<style>
+.hf-loader.loader-wrapper {
+  display: none;
+  will-change: opacity;
+  position: absolute;
+  left: 0;
+  width: 100%;
+  opacity: 0;
+  z-index: 10;
+  transition: opacity .3s;
+  justify-content: center;
+  align-items: center;
+  border-radius: 6px;
+}
+
+.hf-loader.loader-wrapper.is-active {
+  display: flex;
+  opacity: 1;
+}
+
+.hf-loader.loader-wrapper .loader {
+  height: 5rem;
+  width: 5rem;
+}
+</style>

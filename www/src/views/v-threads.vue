@@ -11,6 +11,9 @@
       </div>
     </nav>
     <article class="section">
+      <div :class="{ 'is-active': loading }" class="hf-loader loader-wrapper">
+        <div class="loader is-loading"></div>
+      </div>
       <thread-row v-for="thread in sortedThreads" :key="thread.thread" :realm="realm" :theme="theme" :thread="thread" />
     </article>
   </section>
@@ -42,6 +45,8 @@ export default class VThreads extends Vue {
 
   page = 1;
 
+  loading = true;
+
   private async setTheme() {
     const id = parseInt(this.$route.params['theme']);
     if (isNaN(id)) {
@@ -61,13 +66,14 @@ export default class VThreads extends Vue {
 
   @Watch('page')
   private async fetchThreads() {
-    if (this.theme == null) {
-      return;
+    if (this.theme != null) {
+      this.loading = true;
+      const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads?offset=${this.offset}&limit=10`);
+      const json = await res.json();
+      const threads = List.fromJSON(Thread, json).list;
+      this.threads = threads;
     }
-    const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes/${this.theme.hfid}/threads?offset=${this.offset}&limit=10`);
-    const json = await res.json();
-    const threads = List.fromJSON(Thread, json).list;
-    this.threads = threads;
+    this.loading = false;
   }
 
   beforeMount() {
