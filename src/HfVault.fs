@@ -146,6 +146,7 @@ let insertTheme forumTheme =
   let theme =
     Domain.Theme.new_
     |> (forumTheme^.Forum.Theme.name_)^=Domain.Theme.name_
+    |> (forumTheme^.Forum.Theme.desc_)^=Domain.Theme.desc_
   in
   let hfTheme =
     Domain.HfTheme.new_
