@@ -5,7 +5,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import ThemeRow from '@/components/theme-row.vue';
 import Realm from '@/dto/Realm';
 import Theme from '@/dto/Theme';
@@ -21,6 +21,7 @@ export default class VThemes extends Vue {
 
   themes: Theme[] = [];
 
+  @Watch('realm')
   private async fetchThemes() {
     const res = await fetch(`http://localhost:5000/forum/realms/${this.realm.toString()}/themes`);
     const json = await res.json();

@@ -57,7 +57,7 @@ export default class VThreads extends Vue {
         const json = await res.json();
         this.theme = Theme.fromJSON(json);
       } catch {
-        this.theme = null;
+        this.theme = new Theme('404 :(', -1, this.realm, 0);
       }
     }
     this.$emit('theme', this.theme);
@@ -76,8 +76,13 @@ export default class VThreads extends Vue {
     this.loading = false;
   }
 
-  beforeMount() {
+  @Watch('realm')
+  private realmChanged() {
     this.setTheme().then(() => this.fetchThreads());
+  }
+
+  beforeMount() {
+    this.realmChanged();
   }
 
   get sortedThreads() {

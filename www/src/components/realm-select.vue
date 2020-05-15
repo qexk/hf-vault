@@ -10,11 +10,11 @@
                   'is-loading': this.state == 0,
                 }"
                 >
-              <select>
+              <select @input="selectRealm">
                 <option
-                    v-for="option in options"
+                    v-for="(option, ix) in options"
                     :key="option.text"
-                    :value="option.value"
+                    :value="ix"
                     >
                   {{ option.text }}
                 </option>
@@ -22,7 +22,7 @@
             </div>
           </div>
           <div class="control">
-            <a class="button is-info" @click="fetchRealms()">
+            <a class="button is-info" @click="fetchRealms">
               Refresh realms
             </a>
           </div>
@@ -53,15 +53,6 @@ export default class RealmSelect extends Vue {
   options: Option[] = [];
   state: State = State.FirstTime;
 
-  private emitEvent(dto: List<Realm>) {
-    const realms = dto.list;
-    if (realms.length > 0) {
-      this.$emit('realm', realms[0]);
-    } else {
-      this.$emit('realm', null);
-    }
-  }
-
   private async fetchRealms() {
     if (this.state == State.Loading) {
       return;
@@ -76,12 +67,22 @@ export default class RealmSelect extends Vue {
         value: r,
       }
     });
-    this.emitEvent(realms);
+    if (realms.list.length > 0) {
+      this.$emit('realm', realms.list[0]);
+    } else {
+      this.$emit('realm', null);
+    }
     this.state = State.Ready;
   }
 
   beforeMount() {
     this.fetchRealms();
+  }
+
+  selectRealm(ev: Event) {
+    const ix = +(ev.target as HTMLSelectElement).value;
+    const realm = this.options[ix].value;
+    this.$emit('realm', realm || null);
   }
 }
 </script>
