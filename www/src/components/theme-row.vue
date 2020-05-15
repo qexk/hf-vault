@@ -48,7 +48,7 @@
 </template>
 
 <script lang="ts">
-import { Component, Prop, Vue } from 'vue-property-decorator';
+import { Component, Prop, Watch, Vue } from 'vue-property-decorator';
 import MagnitudeNumber from '@/components/magnitude-number.vue';
 import Theme from '@/dto/Theme';
 import ThemeStats from '@/dto/ThemeStats';
@@ -72,6 +72,7 @@ export default class ThemeRow extends Vue {
     return `/theme/${this.theme.hfid}/thread/${this.stats.thread}`;
   }
 
+  @Watch('theme')
   private async fetchStats() {
     const res = await fetch(`http://localhost:5000/forum/realms/${this.theme.realm.toString()}/themes/${this.theme.hfid}/stats`);
     const json = await res.json();

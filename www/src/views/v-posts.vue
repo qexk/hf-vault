@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="level-right">
-        <nav-page v-model="page" min="1" :max="maxPage" />
+        <nav-page :key="page" v-model.number="page" min="1" :max="maxPage" />
       </div>
     </nav>
     <article class="section">
@@ -20,7 +20,7 @@
       <div class="level-left">
       </div>
       <div class="level-right">
-        <nav-page v-model="page" min="1" :max="maxPage" />
+        <nav-page :key="page" v-model.number="page" min="1" :max="maxPage" />
       </div>
     </nav>
   </section>
