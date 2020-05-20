@@ -35,6 +35,8 @@ HF Vault is a crawler for archiving the [Hammerfest] forum. It scrapes each and 
 
 This project is for documentation purpose only. The forum has already been archived. Please don’t abuse the poor servers from 2006.
 
+You can see a working [**proof of concept**](https://hf-vault.goto.codes) online, built using the two subprojects [api](./api) and [www](./www).
+
 ## Getting started
 
 ### Prerequisites

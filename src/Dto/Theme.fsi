@@ -24,6 +24,7 @@ namespace HfVault.Dto
 
     type DbRepr = { id : int
                   ; name : string
+                  ; description : string
                   }
 
     val toDb : T
@@ -39,5 +40,6 @@ namespace HfVault.Domain
     val new_ : T
     val id_ : Aether.Lens<T, int>
     val name_ : Aether.Lens<T, string>
+    val desc_ : Aether.Lens<T, string>
 
     val dto_ : Aether.Isomorphism<HfVault.Dto.Theme.T, T>

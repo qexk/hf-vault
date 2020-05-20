@@ -29,15 +29,18 @@ open HfVault.Optics
 type T = { realm : Realm.T
          ; id : int
          ; name : string
+         ; desc : string
          }
 
-let new_ = {realm=Unchecked.defaultof<_>;id=0;name=null}
+let new_ = {realm=Unchecked.defaultof<_>;id=0;name=null;desc=null}
 
 let realm_ = (fun {realm=l} -> l), (fun l t -> {t with realm=l})
 
 let id_ = (fun {id=i} -> i), (fun i t -> {t with id=i})
 
 let name_ = (fun {name=n} -> n), (fun n t -> {t with name=n})
+
+let desc_ = (fun {desc=d} -> d), (fun d t -> {t with desc=d})
 
 let rowsXpath =
   XPathExpression.Compile

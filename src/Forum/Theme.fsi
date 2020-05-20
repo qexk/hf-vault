@@ -30,6 +30,8 @@ val id_ : Lens<T, int>
 
 val name_ : Lens<T, string>
 
+val desc_ : Lens<T, string>
+
 val load : HtmlAgilityPack.HtmlWeb
         -> T
         -> Thread.T list
