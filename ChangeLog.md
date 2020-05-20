@@ -4,6 +4,19 @@ All notable changes to this project will be documented in this file. See [NEWS.m
 
 The format is based on [Keep a Changelog], and this project adheres to [Semantic Versioning].
 
+### [1.1.0] – 2020-05-20
+
+#### Added
+
+- Two subprojects used for testing the data:
+  + `./api/`: sample F# REST API serving the scraped forum data.
+  + `./www/`: sample Vue.js webapp.
+
+#### Changed
+
+- `v1.theme-description.sql`: New database migration.
+- The theme’s descriptions are now scraped and stored.
+
 ### [1.0.0] – 2020-05-05
 
 #### Added
