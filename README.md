@@ -35,8 +35,6 @@ HF Vault is a crawler for archiving the [Hammerfest] forum. It scrapes each and 
 
 This project is for documentation purpose only. The forum has already been archived. Please don’t abuse the poor servers from 2006.
 
-You can see a working [**proof of concept**](https://hf-vault.goto.codes) online, built using the two subprojects [api](./api) and [www](./www).
-
 ## Getting started
 
 ### Prerequisites
@@ -127,21 +125,6 @@ To build and run the project. If it shows the usage and some log lines, it’s a
 > ! Warning !
 > The build will fail if the database hasn’t been properly initialised.
 > ```
-
-## Roadmap
-
-See the [open issues] for a list of proposed features (and known issues).
-
-## Contributing
-
-Pull requests are welcome! Tests are not mandatory, but a good typed representation of the business logic is always better.
-
-1. Fork the project
-2. Switch to the develop branch: `git checkout develop`
-3. Create your feature/hotfix branch: `git checkout -b feature/be-faster` or `git checkout -b hotfix/stop-choking-on-nulls`
-4. Commit your changes following these [commit guidelines]
-5. Push your branch
-6. Open a Pull Request
 
 ### Overview
 
